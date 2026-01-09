@@ -115,6 +115,11 @@
             <label>রোল (শুরু)</label><br>
             <input type="number" id="rollStart" class="input-field" style="width: 60px;" value="1" oninput="saveData()">
         </div>
+        
+        <div class="input-group" style="background: #fff3e0; padding: 5px; border-radius: 5px; border: 1px solid #ff9800;">
+            <label style="color: #e65100; font-weight: bold;">নির্দিষ্ট রোল (যেমন: 2,5,10)</label><br>
+            <input type="text" id="filterRoll" class="input-field" style="width: 130px;" placeholder="কমা দিয়ে লিখুন" oninput="generateSheets()">
+        </div>
 
         <div style="display: flex; gap: 15px; max-width: 1000px; margin: 10px auto;">
             <div style="flex: 1; text-align: left;">
@@ -141,7 +146,6 @@
 </div>
 
 <script>
-    // --- পাসওয়ার্ড লজিক (সংশোধিত) ---
     let masterPass = localStorage.getItem('master_password');
 
     window.onload = function() {
@@ -154,10 +158,7 @@
     function checkPassword() {
         const input = document.getElementById('passInput').value;
         if(!masterPass) {
-            if(input.length < 4) {
-                alert("পাসওয়ার্ড কমপক্ষে ৪ অক্ষরের হতে হবে!");
-                return;
-            }
+            if(input.length < 4) { alert("পাসওয়ার্ড কমপক্ষে ৪ অক্ষরের হতে হবে!"); return; }
             localStorage.setItem('master_password', input);
             masterPass = input;
             alert("পাসওয়ার্ড সেট হয়েছে! এখন প্রবেশ করুন।");
@@ -168,36 +169,25 @@
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('mainDashboard').style.display = 'block';
                 initDashboard();
-            } else {
-                alert("ভুল পাসওয়ার্ড!");
-            }
+            } else { alert("ভুল পাসওয়ার্ড!"); }
         }
     }
 
-    // পাসওয়ার্ড পরিবর্তন করার নতুন ফাংশন
     function changePassword() {
         const oldPass = prompt("নিরাপত্তার জন্য বর্তমান পাসওয়ার্ডটি দিন:");
-        if (oldPass === null) return; // Cancel চাপলে
-        
+        if (oldPass === null) return;
         if (oldPass === masterPass) {
             const newPass = prompt("নতুন পাসওয়ার্ড দিন (কমপক্ষে ৪ অক্ষর):");
             if (newPass && newPass.length >= 4) {
                 localStorage.setItem('master_password', newPass);
                 masterPass = newPass;
                 alert("পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে!");
-            } else if (newPass !== null) {
-                alert("পাসওয়ার্ড ৪ অক্ষরের কম হতে পারবে না।");
-            }
-        } else {
-            alert("বর্তমান পাসওয়ার্ড সঠিক নয়!");
-        }
+            } else if (newPass !== null) { alert("পাসওয়ার্ড ৪ অক্ষরের কম হতে পারবে না।"); }
+        } else { alert("বর্তমান পাসওয়ার্ড সঠিক নয়!"); }
     }
 
-    function logout() {
-        location.reload();
-    }
+    function logout() { location.reload(); }
 
-    // --- ড্যাশবোর্ড ডাটা লজিক ---
     function initDashboard() {
         const savedData = JSON.parse(localStorage.getItem('attendance_data'));
         if (savedData) {
@@ -229,6 +219,7 @@
             subjectList: document.getElementById('subjectList').value
         };
         localStorage.setItem('attendance_data', JSON.stringify(data));
+        generateSheets(); // ইনপুট দেওয়ার সাথে সাথে ভিউ আপডেট হবে
     }
 
     function clearAllData() {
@@ -236,9 +227,7 @@
         if (confirmPass === masterPass) {
             localStorage.removeItem('attendance_data');
             location.reload();
-        } else if (confirmPass !== null) {
-            alert("ভুল পাসওয়ার্ড! ডাটা মোছা সম্ভব নয়।");
-        }
+        } else if (confirmPass !== null) { alert("ভুল পাসওয়ার্ড!"); }
     }
 
     function generateSheets() {
@@ -249,20 +238,29 @@
         const dept = document.getElementById('deptName').value.trim();
         const startRoll = parseInt(document.getElementById('rollStart').value) || 1;
         
-        const names = document.getElementById('nameList').value.split('\n').map(n => n.trim());
+        // নির্দিষ্ট রোল ফিল্টার লজিক
+        const filterVal = document.getElementById('filterRoll').value.trim();
+        let allowedRolls = filterVal ? filterVal.split(',').map(r => r.trim()) : [];
+
+        const names = document.getElementById('nameList').value.split('\n').map(n => n.trim()).filter(n => n !== "");
         const subjects = document.getElementById('subjectList').value.split(',').map(s => s.trim()).filter(s => s !== "");
 
         const container = document.getElementById('sheetContainer');
         container.innerHTML = "";
 
         names.forEach((name, index) => {
-            let currentRoll = startRoll + index;
+            let currentRoll = (startRoll + index).toString();
+
+            // যদি ফিল্টারে কিছু থাকে এবং বর্তমান রোল তার মধ্যে না থাকে, তবে স্কিপ করো
+            if (allowedRolls.length > 0 && !allowedRolls.includes(currentRoll)) {
+                return;
+            }
+
             let tableRows = "";
             subjects.forEach((sub, sIndex) => {
                 tableRows += `<tr><td>${sIndex + 1}</td><td style="text-align: left; padding-left: 8px;">${sub}</td><td></td><td class="box-empty"></td><td class="box-empty"></td></tr>`;
             });
 
-            let displayName = name === "" ? "........................................" : name;
             let secondRowLeft = `<div class="sub-cell">শ্রেণি: ${cls}</div>`;
             if(sec !== "") secondRowLeft += `<div class="sub-cell">শাখা: ${sec}</div>`;
 
@@ -275,7 +273,7 @@
                     </div>
                     <div class="info-container">
                         <div class="info-row">
-                            <div class="col-main">নাম: ${displayName}</div>
+                            <div class="col-main">নাম: ${name}</div>
                             <div class="col-side">রোল নম্বর: ${currentRoll}</div>
                         </div>
                         <div class="info-row">
@@ -301,9 +299,9 @@
 
     function exportJSON() {
         const data = localStorage.getItem('attendance_data');
-        if(!data) { alert("কোনো ডাটা নেই সেভ করার জন্য!"); return; }
+        if(!data) { alert("কোনো ডাটা নেই!"); return; }
         const blob = new Blob([data], {type: 'application/json'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'attendance_master_file.json'; a.click();
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'attendance_backup.json'; a.click();
     }
 
     function importJSON(event) {
@@ -316,10 +314,8 @@
                 loadDataIntoFields(data);
                 saveData();
                 generateSheets();
-                alert("ডাটা সফলভাবে রিস্টোর হয়েছে!");
-            } catch (err) {
-                alert("ভুল ফাইল!");
-            }
+                alert("রিস্টোর হয়েছে!");
+            } catch (err) { alert("ভুল ফাইল!"); }
         };
         reader.readAsText(file);
     }
