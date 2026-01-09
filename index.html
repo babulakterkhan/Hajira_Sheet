@@ -2,129 +2,80 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>Attendance Master - Secure Pro Dashboard</title>
+    <title>Attendance Master - Pro Dashboard</title>
     <style>
         body { font-family: 'SolaimanLipi', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; }
-        
-        /* লগইন স্ক্রিন */
-        #loginOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #007bff, #0056b3); display: flex;
-            justify-content: center; align-items: center; z-index: 9999;
-        }
-        .login-box {
-            background: white; padding: 35px; border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3); text-align: center; width: 340px;
-        }
-
-        .control-box { 
-            background: #fff; padding: 15px; border-bottom: 3px solid #007bff; 
-            max-width: 1100px; margin: 15px auto; border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center;
-        }
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #007bff, #0056b3); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .login-box { background: white; padding: 35px; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); text-align: center; width: 340px; }
+        .control-box { background: #fff; padding: 15px; border-bottom: 3px solid #007bff; max-width: 1100px; margin: 15px auto; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
         .input-group { margin: 8px; display: inline-block; text-align: left; vertical-align: top; }
         .input-field { padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px; font-size: 14px; }
         .full-textarea { width: 95%; height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; resize: vertical; margin-top: 5px; font-family: inherit; font-size: 14px; }
-        
         .btn { padding: 10px 18px; border: none; border-radius: 5px; color: #fff; cursor: pointer; font-weight: bold; margin: 5px; font-size: 13px; transition: 0.3s; }
-        .btn-blue { background: #007bff; }
-        .btn-green { background: #28a745; }
-        .btn-orange { background: #fd7e14; }
-        .btn-red { background: #dc3545; }
-        .btn-gray { background: #6c757d; }
-        .btn-black { background: #343a40; }
-        .btn:hover { opacity: 0.8; }
-
+        .btn-blue { background: #007bff; } .btn-green { background: #28a745; } .btn-orange { background: #fd7e14; } .btn-red { background: #dc3545; } .btn-black { background: #343a40; } .btn-gray { background: #6c757d; }
+        
         .sheet-container { width: 210mm; margin: 0 auto; }
-        .student-page { 
-            width: 210mm; height: 297mm; padding: 10mm 15mm; background: white; 
-            box-sizing: border-box; border: 1px solid #eee; page-break-after: always;
-            display: flex; flex-direction: column;
-        }
-
-        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; }
+        .student-page { width: 210mm; height: 297mm; padding: 10mm 15mm; background: white; box-sizing: border-box; border: 1px solid #eee; page-break-after: always; display: flex; flex-direction: column; }
+        
+        .header { display: flex; align-items: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; }
+        .logo-img { width: 70px; height: 70px; object-fit: contain; margin-left: 50px; margin-right: 10px; }
+        .header-text { flex-grow: 1; text-align: center; margin-right: 100px; } 
         .header h2 { margin: 0; font-size: 24px; }
         .header h3 { margin: 4px 0; font-size: 18px; }
 
         .info-container { border: 2px solid #000; margin-bottom: 12px; font-size: 17px; font-weight: bold; width: 100%; box-sizing: border-box; }
         .info-row { display: flex; border-bottom: 2px solid #000; width: 100%; }
         .info-row:last-child { border-bottom: none; }
+        .col-main { flex: 0 0 65%; padding: 8px; border-right: 2px solid #000; text-align: left; }
+        .col-side { flex: 0 0 35%; padding: 8px; text-align: center; }
         
-        .col-main { flex: 0 0 65%; padding: 8px; border-right: 2px solid #000; background: #fdfdfd; text-align: left; box-sizing: border-box; }
-        .col-side { flex: 0 0 35%; padding: 8px; background: #fdfdfd; text-align: center; box-sizing: border-box; }
-        
-        .sub-row { display: flex; width: 100%; }
-        .sub-cell { flex: 1; border-right: 1px solid #000; padding-left: 5px; }
-        .sub-cell:last-child { border-right: none; }
-
         table { width: 100%; border-collapse: collapse; }
         th, td { border: 1px solid #000; padding: 6px 4px; text-align: center; font-size: 14px; }
         th { background: #e9e9e9; }
         .box-empty { height: 35px; } 
 
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white; }
-            .student-page { border: none; margin: 0; padding: 10mm 15mm; }
-            @page { size: A4; margin: 0; }
-        }
+        @media print { .no-print { display: none !important; } .student-page { border: none; margin: 0; } @page { size: A4; margin: 0; } }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
     <div class="login-box">
-        <h3 id="loginTitle" style="margin-top: 0;">প্রবেশাধিকার</h3>
-        <p id="passMsg" style="font-size: 13px; color: #666; margin-bottom: 15px;">আপনার ড্যাশবোর্ড পাসওয়ার্ড দিন</p>
+        <h3>প্রবেশাধিকার</h3>
         <input type="password" id="passInput" class="input-field" style="width: 100%; margin-bottom: 15px; box-sizing: border-box;" placeholder="পাসওয়ার্ড" onkeypress="if(event.key === 'Enter') checkPassword()">
-        <button class="btn btn-blue" style="width: 100%; margin: 0;" onclick="checkPassword()">ড্যাশবোর্ডে প্রবেশ করুন</button>
+        <button class="btn btn-blue" style="width: 100%;" onclick="checkPassword()">প্রবেশ করুন</button>
     </div>
 </div>
 
 <div id="mainDashboard" style="display: none;">
     <div class="control-box no-print">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px;">
             <h2 style="margin: 0; color: #007bff;">Secure Dashboard</h2>
             <div>
-                <button class="btn btn-black" style="font-size: 11px;" onclick="changePassword()">পাসওয়ার্ড পরিবর্তন</button>
-                <button class="btn btn-red" style="font-size: 11px;" onclick="logout()">লগআউট</button>
+                <button class="btn btn-black" onclick="changePassword()">পাসওয়ার্ড পরিবর্তন</button>
+                <button class="btn btn-red" onclick="logout()">লগআউট</button>
             </div>
         </div>
         
         <div class="input-group">
-            <label>প্রতিষ্ঠানের নাম</label><br>
-            <input type="text" id="instName" class="input-field" style="width: 220px;" oninput="saveData()">
+            <label>লোগো আপলোড</label><br>
+            <input type="file" id="logoUpload" accept="image/*" class="input-field" style="width: 180px;" onchange="handleLogo(this)">
         </div>
-        <div class="input-group">
-            <label>পরীক্ষার নাম</label><br>
-            <input type="text" id="examName" class="input-field" style="width: 180px;" oninput="saveData()">
-        </div>
-        <div class="input-group">
-            <label>শ্রেণি</label><br>
-            <input type="text" id="className" class="input-field" style="width: 70px;" oninput="saveData()">
-        </div>
-        <div class="input-group">
-            <label>শাখা</label><br>
-            <input type="text" id="sectionName" class="input-field" style="width: 70px;" oninput="saveData()">
-        </div>
-        <div class="input-group">
-            <label>বিভাগ</label><br>
-            <input type="text" id="deptName" class="input-field" style="width: 130px;" oninput="saveData()">
-        </div>
-        
-        <div class="input-group" style="background: #fff3e0; padding: 5px; border-radius: 5px; border: 1px solid #ff9800;">
-            <label style="color: #e65100; font-weight: bold;">নির্দিষ্ট রোল ফিল্টার (ঐচ্ছিক)</label><br>
-            <input type="text" id="filterRoll" class="input-field" style="width: 130px;" placeholder="যেমন: 2,5,10" oninput="generateSheets()">
+        <div class="input-group"><label>প্রতিষ্ঠানের নাম</label><br><input type="text" id="instName" class="input-field" style="width: 200px;" oninput="saveData()"></div>
+        <div class="input-group"><label>পরীক্ষার নাম</label><br><input type="text" id="examName" class="input-field" style="width: 150px;" oninput="saveData()"></div>
+        <div class="input-group"><label>শ্রেণি/শাখা/বিভাগ</label><br>
+            <input type="text" id="className" placeholder="শ্রেণি" class="input-field" style="width: 60px;" oninput="saveData()">
+            <input type="text" id="sectionName" placeholder="শাখা" class="input-field" style="width: 60px;" oninput="saveData()">
+            <input type="text" id="deptName" placeholder="বিভাগ" class="input-field" style="width: 100px;" oninput="saveData()">
         </div>
 
         <div style="display: flex; gap: 15px; max-width: 1000px; margin: 10px auto;">
             <div style="flex: 1.5; text-align: left;">
-                <label style="font-weight: bold;">ছাত্র-ছাত্রীর ডাটা (নাম রোল একসাথে):</label><br>
-                <small style="color: blue;">Excel থেকে নাম ও রোল কলাম কপি করে এখানে দিন</small>
-                <textarea id="studentData" class="full-textarea" placeholder="করিম 101&#10;রহিম 102" oninput="saveData()"></textarea>
+                <label style="font-weight: bold;">ছাত্র-ছাত্রীর ডাটা (নাম রোল):</label><br>
+                <textarea id="studentData" class="full-textarea" oninput="saveData()"></textarea>
             </div>
             <div style="flex: 1; text-align: left;">
-                <label style="font-weight: bold;">বিষয়ের তালিকা (কমা দিয়ে):</label><br>
+                <label style="font-weight: bold;">বিষয়ের তালিকা (তারিখ সহ):</label><br>
                 <textarea id="subjectList" class="full-textarea" oninput="saveData()"></textarea>
             </div>
         </div>
@@ -132,75 +83,53 @@
         <div>
             <button class="btn btn-blue" onclick="generateSheets()">তৈরি করুন</button>
             <button class="btn btn-green" onclick="window.print()">প্রিন্ট করুন</button>
-            <button class="btn btn-orange" onclick="exportJSON()">ব্যাকআপ (Save)</button>
+            <button class="btn btn-orange" onclick="exportJSON()">ব্যাকআপ (Backup)</button>
             <button class="btn btn-gray" onclick="document.getElementById('importFile').click()">রিস্টোর (Restore)</button>
             <button class="btn btn-red" onclick="clearAllData()">সব মুছুন</button>
             <input type="file" id="importFile" style="display:none" onchange="importJSON(event)">
         </div>
     </div>
-
     <div id="sheetContainer" class="sheet-container"></div>
 </div>
 
 <script>
     let masterPass = localStorage.getItem('master_password');
-
-    window.onload = function() {
-        if(!masterPass) {
-            document.getElementById('loginTitle').innerText = "পাসওয়ার্ড সেটআপ";
-            document.getElementById('passMsg').innerText = "প্রথমবার ব্যবহারের জন্য একটি পাসওয়ার্ড সেট করুন";
-        }
-    };
+    let logoBase64 = localStorage.getItem('school_logo') || "";
 
     function checkPassword() {
         const input = document.getElementById('passInput').value;
-        if(!masterPass) {
-            if(input.length < 4) { alert("পাসওয়ার্ড কমপক্ষে ৪ অক্ষরের হতে হবে!"); return; }
-            localStorage.setItem('master_password', input);
-            masterPass = input;
-            alert("পাসওয়ার্ড সেট হয়েছে! এখন প্রবেশ করুন।");
-            document.getElementById('passInput').value = "";
-            document.getElementById('loginTitle').innerText = "প্রবেশাধিকার";
-        } else {
-            if(input === masterPass) {
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('mainDashboard').style.display = 'block';
-                initDashboard();
-            } else { alert("ভুল পাসওয়ার্ড!"); }
+        if(!masterPass) { localStorage.setItem('master_password', input); masterPass = input; }
+        if(input === masterPass) {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('mainDashboard').style.display = 'block';
+            init();
+        } else { alert("ভুল পাসওয়ার্ড!"); }
+    }
+
+    function handleLogo(input) {
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                logoBase64 = e.target.result;
+                localStorage.setItem('school_logo', logoBase64);
+                generateSheets();
+            };
+            reader.readAsDataURL(input.files[0]);
         }
     }
 
-    function changePassword() {
-        const oldPass = prompt("নিরাপত্তার জন্য বর্তমান পাসওয়ার্ডটি দিন:");
-        if (oldPass === null) return;
-        if (oldPass === masterPass) {
-            const newPass = prompt("নতুন পাসওয়ার্ড দিন (কমপক্ষে ৪ অক্ষর):");
-            if (newPass && newPass.length >= 4) {
-                localStorage.setItem('master_password', newPass);
-                masterPass = newPass;
-                alert("পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে!");
-            } else if (newPass !== null) { alert("পাসওয়ার্ড ৪ অক্ষরের কম হতে পারবে না।"); }
-        } else { alert("বর্তমান পাসওয়ার্ড সঠিক নয়!"); }
-    }
-
-    function logout() { location.reload(); }
-
-    function initDashboard() {
-        const savedData = JSON.parse(localStorage.getItem('attendance_v3_data'));
-        if (savedData) {
-            loadDataIntoFields(savedData);
+    function init() {
+        const saved = JSON.parse(localStorage.getItem('attendance_v5_data'));
+        if (saved) {
+            document.getElementById('instName').value = saved.instName || '';
+            document.getElementById('examName').value = saved.examName || '';
+            document.getElementById('className').value = saved.className || '';
+            document.getElementById('sectionName').value = saved.sectionName || '';
+            document.getElementById('deptName').value = saved.deptName || '';
+            document.getElementById('studentData').value = saved.studentData || '';
+            document.getElementById('subjectList').value = saved.subjectList || '';
             generateSheets();
         }
-    }
-
-    function loadDataIntoFields(data) {
-        document.getElementById('instName').value = data.instName || '';
-        document.getElementById('examName').value = data.examName || '';
-        document.getElementById('className').value = data.className || '';
-        document.getElementById('sectionName').value = data.sectionName || '';
-        document.getElementById('deptName').value = data.deptName || '';
-        document.getElementById('studentData').value = data.studentData || '';
-        document.getElementById('subjectList').value = data.subjectList || '';
     }
 
     function saveData() {
@@ -213,61 +142,52 @@
             studentData: document.getElementById('studentData').value,
             subjectList: document.getElementById('subjectList').value
         };
-        localStorage.setItem('attendance_v3_data', JSON.stringify(data));
+        localStorage.setItem('attendance_v5_data', JSON.stringify(data));
         generateSheets();
-    }
-
-    function clearAllData() {
-        const confirmPass = prompt("সব ডাটা মুছতে বর্তমান পাসওয়ার্ড দিন:");
-        if (confirmPass === masterPass) {
-            localStorage.removeItem('attendance_v3_data');
-            location.reload();
-        } else if (confirmPass !== null) { alert("ভুল পাসওয়ার্ড!"); }
     }
 
     function generateSheets() {
         const inst = document.getElementById('instName').value || "প্রতিষ্ঠানের নাম";
         const exam = document.getElementById('examName').value || "পরীক্ষার নাম";
-        const cls = document.getElementById('className').value || "............";
+        const cls = document.getElementById('className').value || "........";
         const sec = document.getElementById('sectionName').value.trim();
         const dept = document.getElementById('deptName').value.trim();
         
-        const filterVal = document.getElementById('filterRoll').value.trim();
-        let allowedRolls = filterVal ? filterVal.split(',').map(r => r.trim()) : [];
-
         const rawLines = document.getElementById('studentData').value.split('\n').filter(line => line.trim() !== "");
-        const subjects = document.getElementById('subjectList').value.split(',').map(s => s.trim()).filter(s => s !== "");
+        const subjectsRaw = document.getElementById('subjectList').value.split(',').filter(s => s.trim() !== "");
+        const subjectsData = subjectsRaw.map(s => {
+            let match = s.match(/(.+?)\s*\((.+?)\)/);
+            return match ? { name: match[1].trim(), date: match[2].trim() } : { name: s.trim(), date: "" };
+        });
 
         const container = document.getElementById('sheetContainer');
         container.innerHTML = "";
 
         rawLines.forEach((line) => {
-            // নাম এবং রোল আলাদা করার লজিক (লাইনের শেষের অংশটি রোল)
             let parts = line.split(/(\s+)/).filter(p => p.trim().length > 0);
             if(parts.length < 1) return;
-            
-            let roll = parts.length > 1 ? parts.pop() : "---"; // শেষ অংশটি রোল
-            let name = parts.join(" "); // বাকিটুকু নাম
-
-            // ফিল্টার চেক
-            if (allowedRolls.length > 0 && !allowedRolls.includes(roll.toString())) {
-                return;
-            }
+            let roll = parts.pop();
+            let name = parts.join(" ");
 
             let tableRows = "";
-            subjects.forEach((sub, sIndex) => {
-                tableRows += `<tr><td>${sIndex + 1}</td><td style="text-align: left; padding-left: 8px;">${sub}</td><td></td><td class="box-empty"></td><td class="box-empty"></td></tr>`;
+            subjectsData.forEach((sub, idx) => {
+                tableRows += `<tr><td>${idx+1}</td><td style="text-align:left; padding-left:8px;">${sub.name}</td><td>${sub.date}</td><td class="box-empty"></td><td class="box-empty"></td></tr>`;
             });
 
-            let secondRowLeft = `<div class="sub-cell">শ্রেণি: ${cls}</div>`;
-            if(sec !== "") secondRowLeft += `<div class="sub-cell">শাখা: ${sec}</div>`;
+            let logoHtml = logoBase64 ? `<img src="${logoBase64}" class="logo-img">` : `<div style="width:80px;"></div>`;
+
+            // বিভাগ হাইড লজিক
+            let deptHtml = dept !== "" ? `বিভাগ: ${dept}` : "";
 
             container.innerHTML += `
                 <div class="student-page">
                     <div class="header">
-                        <h2>${inst}</h2>
-                        <h3>${exam}</h3>
-                        <p>ব্যক্তিগত হাজিরা ও উত্তরপত্র সংগ্রহের রেকর্ড</p>
+                        ${logoHtml}
+                        <div class="header-text">
+                            <h2>${inst}</h2>
+                            <h3>${exam}</h3>
+                            <p style="margin:2px 0;">ব্যক্তিগত হাজিরা ও উত্তরপত্র সংগ্রহের রেকর্ড</p>
+                        </div>
                     </div>
                     <div class="info-container">
                         <div class="info-row">
@@ -275,49 +195,52 @@
                             <div class="col-side">রোল নম্বর: ${roll}</div>
                         </div>
                         <div class="info-row">
-                            <div class="col-main"><div class="sub-row">${secondRowLeft}</div></div>
-                            <div class="col-side">${dept !== "" ? 'বিভাগ: ' + dept : '&nbsp;'}</div>
+                            <div class="col-main">শ্রেণি: ${cls} ${sec ? '| শাখা: '+sec : ''}</div>
+                            <div class="col-side">${deptHtml}</div>
                         </div>
                     </div>
                     <table>
-                        <thead>
-                            <tr>
-                                <th width="7%">ক্র.নং</th>
-                                <th width="33%">বিষয়ের নাম</th>
-                                <th width="14%">তারিখ</th>
-                                <th width="23%">শিক্ষার্থীর স্বাক্ষর</th>
-                                <th width="23%">পরিদর্শকের স্বাক্ষর</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th width="7%">ক্র.নং</th><th width="33%">বিষয়ের নাম</th><th width="14%">তারিখ</th><th width="23%">শিক্ষার্থীর স্বাক্ষর</th><th width="23%">পরিদর্শকের স্বাক্ষর</th></tr></thead>
                         <tbody>${tableRows}</tbody>
                     </table>
                 </div>`;
         });
     }
 
+    function changePassword() {
+        const old = prompt("বর্তমান পাসওয়ার্ড:");
+        if (old === masterPass) {
+            const newP = prompt("নতুন পাসওয়ার্ড (৪ অক্ষর):");
+            if (newP && newP.length >= 4) {
+                localStorage.setItem('master_password', newP);
+                masterPass = newP;
+                alert("পরিবর্তন হয়েছে!");
+            }
+        }
+    }
+
     function exportJSON() {
-        const data = localStorage.getItem('attendance_v3_data');
+        const data = localStorage.getItem('attendance_v5_data');
         if(!data) { alert("কোনো ডাটা নেই!"); return; }
         const blob = new Blob([data], {type: 'application/json'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'attendance_backup.json'; a.click();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'attendance_backup.json';
+        a.click();
     }
 
-    function importJSON(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+    function importJSON(e) {
         const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = JSON.parse(e.target.result);
-                loadDataIntoFields(data);
-                saveData();
-                generateSheets();
-                alert("রিস্টোর হয়েছে!");
-            } catch (err) { alert("ভুল ফাইল!"); }
+        reader.onload = (f) => {
+            localStorage.setItem('attendance_v5_data', f.target.result);
+            init();
+            alert("সব ডাটা রিস্টোর হয়েছে!");
         };
-        reader.readAsText(file);
+        reader.readAsText(e.target.files[0]);
     }
-</script>
 
+    function logout() { location.reload(); }
+    function clearAllData() { if(confirm("সব মুছে যাবে?")) { localStorage.clear(); location.reload(); } }
+</script>
 </body>
 </html>
