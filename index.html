@@ -24,7 +24,7 @@
         }
         .input-group { margin: 8px; display: inline-block; text-align: left; vertical-align: top; }
         .input-field { padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px; font-size: 14px; }
-        .full-textarea { width: 95%; height: 80px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; resize: none; margin-top: 5px; font-family: inherit; font-size: 14px; }
+        .full-textarea { width: 95%; height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; resize: vertical; margin-top: 5px; font-family: inherit; font-size: 14px; }
         
         .btn { padding: 10px 18px; border: none; border-radius: 5px; color: #fff; cursor: pointer; font-weight: bold; margin: 5px; font-size: 13px; transition: 0.3s; }
         .btn-blue { background: #007bff; }
@@ -111,20 +111,17 @@
             <label>বিভাগ</label><br>
             <input type="text" id="deptName" class="input-field" style="width: 130px;" oninput="saveData()">
         </div>
-        <div class="input-group">
-            <label>রোল (শুরু)</label><br>
-            <input type="number" id="rollStart" class="input-field" style="width: 60px;" value="1" oninput="saveData()">
-        </div>
         
         <div class="input-group" style="background: #fff3e0; padding: 5px; border-radius: 5px; border: 1px solid #ff9800;">
-            <label style="color: #e65100; font-weight: bold;">নির্দিষ্ট রোল (যেমন: 2,5,10)</label><br>
-            <input type="text" id="filterRoll" class="input-field" style="width: 130px;" placeholder="কমা দিয়ে লিখুন" oninput="generateSheets()">
+            <label style="color: #e65100; font-weight: bold;">নির্দিষ্ট রোল ফিল্টার (ঐচ্ছিক)</label><br>
+            <input type="text" id="filterRoll" class="input-field" style="width: 130px;" placeholder="যেমন: 2,5,10" oninput="generateSheets()">
         </div>
 
         <div style="display: flex; gap: 15px; max-width: 1000px; margin: 10px auto;">
-            <div style="flex: 1; text-align: left;">
-                <label style="font-weight: bold;">নামের তালিকা:</label><br>
-                <textarea id="nameList" class="full-textarea" oninput="saveData()"></textarea>
+            <div style="flex: 1.5; text-align: left;">
+                <label style="font-weight: bold;">ছাত্র-ছাত্রীর ডাটা (নাম রোল একসাথে):</label><br>
+                <small style="color: blue;">Excel থেকে নাম ও রোল কলাম কপি করে এখানে দিন</small>
+                <textarea id="studentData" class="full-textarea" placeholder="করিম 101&#10;রহিম 102" oninput="saveData()"></textarea>
             </div>
             <div style="flex: 1; text-align: left;">
                 <label style="font-weight: bold;">বিষয়ের তালিকা (কমা দিয়ে):</label><br>
@@ -189,7 +186,7 @@
     function logout() { location.reload(); }
 
     function initDashboard() {
-        const savedData = JSON.parse(localStorage.getItem('attendance_data'));
+        const savedData = JSON.parse(localStorage.getItem('attendance_v3_data'));
         if (savedData) {
             loadDataIntoFields(savedData);
             generateSheets();
@@ -202,8 +199,7 @@
         document.getElementById('className').value = data.className || '';
         document.getElementById('sectionName').value = data.sectionName || '';
         document.getElementById('deptName').value = data.deptName || '';
-        document.getElementById('rollStart').value = data.rollStart || '1';
-        document.getElementById('nameList').value = data.nameList || '';
+        document.getElementById('studentData').value = data.studentData || '';
         document.getElementById('subjectList').value = data.subjectList || '';
     }
 
@@ -214,18 +210,17 @@
             className: document.getElementById('className').value,
             sectionName: document.getElementById('sectionName').value,
             deptName: document.getElementById('deptName').value,
-            rollStart: document.getElementById('rollStart').value,
-            nameList: document.getElementById('nameList').value,
+            studentData: document.getElementById('studentData').value,
             subjectList: document.getElementById('subjectList').value
         };
-        localStorage.setItem('attendance_data', JSON.stringify(data));
-        generateSheets(); // ইনপুট দেওয়ার সাথে সাথে ভিউ আপডেট হবে
+        localStorage.setItem('attendance_v3_data', JSON.stringify(data));
+        generateSheets();
     }
 
     function clearAllData() {
         const confirmPass = prompt("সব ডাটা মুছতে বর্তমান পাসওয়ার্ড দিন:");
         if (confirmPass === masterPass) {
-            localStorage.removeItem('attendance_data');
+            localStorage.removeItem('attendance_v3_data');
             location.reload();
         } else if (confirmPass !== null) { alert("ভুল পাসওয়ার্ড!"); }
     }
@@ -236,23 +231,26 @@
         const cls = document.getElementById('className').value || "............";
         const sec = document.getElementById('sectionName').value.trim();
         const dept = document.getElementById('deptName').value.trim();
-        const startRoll = parseInt(document.getElementById('rollStart').value) || 1;
         
-        // নির্দিষ্ট রোল ফিল্টার লজিক
         const filterVal = document.getElementById('filterRoll').value.trim();
         let allowedRolls = filterVal ? filterVal.split(',').map(r => r.trim()) : [];
 
-        const names = document.getElementById('nameList').value.split('\n').map(n => n.trim()).filter(n => n !== "");
+        const rawLines = document.getElementById('studentData').value.split('\n').filter(line => line.trim() !== "");
         const subjects = document.getElementById('subjectList').value.split(',').map(s => s.trim()).filter(s => s !== "");
 
         const container = document.getElementById('sheetContainer');
         container.innerHTML = "";
 
-        names.forEach((name, index) => {
-            let currentRoll = (startRoll + index).toString();
+        rawLines.forEach((line) => {
+            // নাম এবং রোল আলাদা করার লজিক (লাইনের শেষের অংশটি রোল)
+            let parts = line.split(/(\s+)/).filter(p => p.trim().length > 0);
+            if(parts.length < 1) return;
+            
+            let roll = parts.length > 1 ? parts.pop() : "---"; // শেষ অংশটি রোল
+            let name = parts.join(" "); // বাকিটুকু নাম
 
-            // যদি ফিল্টারে কিছু থাকে এবং বর্তমান রোল তার মধ্যে না থাকে, তবে স্কিপ করো
-            if (allowedRolls.length > 0 && !allowedRolls.includes(currentRoll)) {
+            // ফিল্টার চেক
+            if (allowedRolls.length > 0 && !allowedRolls.includes(roll.toString())) {
                 return;
             }
 
@@ -274,7 +272,7 @@
                     <div class="info-container">
                         <div class="info-row">
                             <div class="col-main">নাম: ${name}</div>
-                            <div class="col-side">রোল নম্বর: ${currentRoll}</div>
+                            <div class="col-side">রোল নম্বর: ${roll}</div>
                         </div>
                         <div class="info-row">
                             <div class="col-main"><div class="sub-row">${secondRowLeft}</div></div>
@@ -298,7 +296,7 @@
     }
 
     function exportJSON() {
-        const data = localStorage.getItem('attendance_data');
+        const data = localStorage.getItem('attendance_v3_data');
         if(!data) { alert("কোনো ডাটা নেই!"); return; }
         const blob = new Blob([data], {type: 'application/json'});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'attendance_backup.json'; a.click();
@@ -314,7 +312,7 @@
                 loadDataIntoFields(data);
                 saveData();
                 generateSheets();
-                alert("রিস্টোর হয়েছে!");
+                alert("রিস্টোর হয়েছে!");
             } catch (err) { alert("ভুল ফাইল!"); }
         };
         reader.readAsText(file);
