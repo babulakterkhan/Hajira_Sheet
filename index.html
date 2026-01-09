@@ -2,19 +2,19 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>Attendance Master - Secure Dashboard</title>
+    <title>Attendance Master - Secure Pro Dashboard</title>
     <style>
         body { font-family: 'SolaimanLipi', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; }
         
-        /* পাসওয়ার্ড স্ক্রিন স্টাইল */
+        /* লগইন স্ক্রিন */
         #loginOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 123, 255, 0.95); display: flex;
+            background: linear-gradient(135deg, #007bff, #0056b3); display: flex;
             justify-content: center; align-items: center; z-index: 9999;
         }
         .login-box {
-            background: white; padding: 30px; border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; width: 320px;
+            background: white; padding: 35px; border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); text-align: center; width: 340px;
         }
 
         .control-box { 
@@ -32,6 +32,7 @@
         .btn-orange { background: #fd7e14; }
         .btn-red { background: #dc3545; }
         .btn-gray { background: #6c757d; }
+        .btn-black { background: #343a40; }
         .btn:hover { opacity: 0.8; }
 
         .sheet-container { width: 210mm; margin: 0 auto; }
@@ -73,18 +74,21 @@
 
 <div id="loginOverlay">
     <div class="login-box">
-        <h3 id="loginTitle">পাসওয়ার্ড দিন</h3>
-        <input type="password" id="passInput" class="input-field" style="width: 100%; margin-bottom: 15px;" placeholder="Password">
-        <button class="btn btn-blue" style="width: 100%;" onclick="checkPassword()">ড্যাশবোর্ডে প্রবেশ করুন</button>
-        <p id="passMsg" style="color: red; font-size: 12px; margin-top: 10px;"></p>
+        <h3 id="loginTitle" style="margin-top: 0;">প্রবেশাধিকার</h3>
+        <p id="passMsg" style="font-size: 13px; color: #666; margin-bottom: 15px;">আপনার ড্যাশবোর্ড পাসওয়ার্ড দিন</p>
+        <input type="password" id="passInput" class="input-field" style="width: 100%; margin-bottom: 15px; box-sizing: border-box;" placeholder="পাসওয়ার্ড" onkeypress="if(event.key === 'Enter') checkPassword()">
+        <button class="btn btn-blue" style="width: 100%; margin: 0;" onclick="checkPassword()">ড্যাশবোর্ডে প্রবেশ করুন</button>
     </div>
 </div>
 
 <div id="mainDashboard" style="display: none;">
     <div class="control-box no-print">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h2 style="margin: 0;">Secure Attendance Dashboard</h2>
-            <button class="btn btn-red" style="font-size: 11px;" onclick="logout()">লগআউট</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            <h2 style="margin: 0; color: #007bff;">Secure Dashboard</h2>
+            <div>
+                <button class="btn btn-black" style="font-size: 11px;" onclick="changePassword()">পাসওয়ার্ড পরিবর্তন</button>
+                <button class="btn btn-red" style="font-size: 11px;" onclick="logout()">লগআউট</button>
+            </div>
         </div>
         
         <div class="input-group">
@@ -137,13 +141,13 @@
 </div>
 
 <script>
-    // পাসওয়ার্ড লজিক
+    // --- পাসওয়ার্ড লজিক (সংশোধিত) ---
     let masterPass = localStorage.getItem('master_password');
 
     window.onload = function() {
         if(!masterPass) {
-            document.getElementById('loginTitle').innerText = "নতুন পাসওয়ার্ড সেট করুন";
-            document.getElementById('passMsg').innerText = "প্রথমবার ব্যবহারের জন্য একটি পাসওয়ার্ড দিন";
+            document.getElementById('loginTitle').innerText = "পাসওয়ার্ড সেটআপ";
+            document.getElementById('passMsg').innerText = "প্রথমবার ব্যবহারের জন্য একটি পাসওয়ার্ড সেট করুন";
         }
     };
 
@@ -151,20 +155,41 @@
         const input = document.getElementById('passInput').value;
         if(!masterPass) {
             if(input.length < 4) {
-                document.getElementById('passMsg').innerText = "কমপক্ষে ৪ অক্ষরের পাসওয়ার্ড দিন";
+                alert("পাসওয়ার্ড কমপক্ষে ৪ অক্ষরের হতে হবে!");
                 return;
             }
             localStorage.setItem('master_password', input);
-            alert("পাসওয়ার্ড সেট হয়েছে!");
-            location.reload();
+            masterPass = input;
+            alert("পাসওয়ার্ড সেট হয়েছে! এখন প্রবেশ করুন।");
+            document.getElementById('passInput').value = "";
+            document.getElementById('loginTitle').innerText = "প্রবেশাধিকার";
         } else {
             if(input === masterPass) {
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('mainDashboard').style.display = 'block';
                 initDashboard();
             } else {
-                document.getElementById('passMsg').innerText = "ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।";
+                alert("ভুল পাসওয়ার্ড!");
             }
+        }
+    }
+
+    // পাসওয়ার্ড পরিবর্তন করার নতুন ফাংশন
+    function changePassword() {
+        const oldPass = prompt("নিরাপত্তার জন্য বর্তমান পাসওয়ার্ডটি দিন:");
+        if (oldPass === null) return; // Cancel চাপলে
+        
+        if (oldPass === masterPass) {
+            const newPass = prompt("নতুন পাসওয়ার্ড দিন (কমপক্ষে ৪ অক্ষর):");
+            if (newPass && newPass.length >= 4) {
+                localStorage.setItem('master_password', newPass);
+                masterPass = newPass;
+                alert("পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে!");
+            } else if (newPass !== null) {
+                alert("পাসওয়ার্ড ৪ অক্ষরের কম হতে পারবে না।");
+            }
+        } else {
+            alert("বর্তমান পাসওয়ার্ড সঠিক নয়!");
         }
     }
 
@@ -172,7 +197,7 @@
         location.reload();
     }
 
-    // ড্যাশবোর্ড লজিক
+    // --- ড্যাশবোর্ড ডাটা লজিক ---
     function initDashboard() {
         const savedData = JSON.parse(localStorage.getItem('attendance_data'));
         if (savedData) {
@@ -207,12 +232,12 @@
     }
 
     function clearAllData() {
-        const confirmPass = prompt("সব ডাটা মুছতে পাসওয়ার্ড দিন:");
+        const confirmPass = prompt("সব ডাটা মুছতে বর্তমান পাসওয়ার্ড দিন:");
         if (confirmPass === masterPass) {
             localStorage.removeItem('attendance_data');
             location.reload();
-        } else {
-            alert("ভুল পাসওয়ার্ড! ডাটা মোছা সম্ভব নয়।");
+        } else if (confirmPass !== null) {
+            alert("ভুল পাসওয়ার্ড! ডাটা মোছা সম্ভব নয়।");
         }
     }
 
@@ -291,7 +316,7 @@
                 loadDataIntoFields(data);
                 saveData();
                 generateSheets();
-                alert("ডাটা সফলভাবে রিস্টোর হয়েছে!");
+                alert("ডাটা সফলভাবে রিস্টোর হয়েছে!");
             } catch (err) {
                 alert("ভুল ফাইল!");
             }
