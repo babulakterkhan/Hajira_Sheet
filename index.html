@@ -2,245 +2,1911 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>Attendance Master - Pro Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>হাজিরা শীট - Attendance Sheet Generator</title>
     <style>
-        body { font-family: 'SolaimanLipi', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; }
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #007bff, #0056b3); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .login-box { background: white; padding: 35px; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); text-align: center; width: 340px; }
-        .control-box { background: #fff; padding: 15px; border-bottom: 3px solid #007bff; max-width: 1100px; margin: 15px auto; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
-        .input-group { margin: 8px; display: inline-block; text-align: left; vertical-align: top; }
-        .input-field { padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px; font-size: 14px; }
-        .full-textarea { width: 95%; height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; resize: vertical; margin-top: 5px; font-family: inherit; font-size: 14px; }
-        .btn { padding: 10px 18px; border: none; border-radius: 5px; color: #fff; cursor: pointer; font-weight: bold; margin: 5px; font-size: 13px; transition: 0.3s; }
-        .btn-blue { background: #007bff; } .btn-green { background: #28a745; } .btn-orange { background: #fd7e14; } .btn-red { background: #dc3545; } .btn-black { background: #343a40; } .btn-gray { background: #6c757d; }
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
-        .sheet-container { width: 210mm; margin: 0 auto; }
-        .student-page { width: 210mm; height: 297mm; padding: 10mm 15mm; background: white; box-sizing: border-box; border: 1px solid #eee; page-break-after: always; display: flex; flex-direction: column; }
-        
-        .header { display: flex; align-items: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; }
-        .logo-img { width: 80px; height: 80px; object-fit: contain; margin-left: 50px; margin-right: 10px; }
-        .header-text { flex-grow: 1; text-align: center; margin-right: 100px; } 
-        .header h2 { margin: 0; font-size: 24px; }
-        .header h3 { margin: 4px 0; font-size: 18px; }
+        body {
+            font-family: 'SolaimanLipi', 'Kalpurush', 'Noto Sans Bengali', 'Segoe UI', Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
 
-        .info-container { border: 2px solid #000; margin-bottom: 12px; font-size: 17px; font-weight: bold; width: 100%; box-sizing: border-box; }
-        .info-row { display: flex; border-bottom: 2px solid #000; width: 100%; }
-        .info-row:last-child { border-bottom: none; }
-        .col-main { flex: 0 0 65%; padding: 8px; border-right: 2px solid #000; text-align: left; }
-        .col-side { flex: 0 0 35%; padding: 8px; text-align: center; }
-        
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #000; padding: 6px 4px; text-align: center; font-size: 14px; }
-        th { background: #e9e9e9; }
-        .box-empty { height: 35px; } 
+        /* Login Overlay */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
 
-        @media print { .no-print { display: none !important; } .student-page { border: none; margin: 0; } @page { size: A4; margin: 0; } }
+        .login-box {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            width: 100%;
+            max-width: 380px;
+            margin: 1rem;
+        }
+
+        .login-icon {
+            width: 64px;
+            height: 64px;
+            background: #eff6ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
+        .login-icon svg {
+            width: 32px;
+            height: 32px;
+            color: #3b82f6;
+        }
+
+        .login-title {
+            font-size: 1.75rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #1e293b;
+        }
+
+        .login-subtitle {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #d1d5db;
+            color: #374151;
+        }
+
+        .btn-outline:hover {
+            background: #f3f4f6;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: #374151;
+        }
+
+        .btn-ghost:hover {
+            background: #f3f4f6;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.813rem;
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            width: 36px;
+            height: 36px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            background: #f1f5f9;
+            padding: 0.5rem;
+            border-radius: 0.75rem;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            border: none;
+            background: transparent;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #3b82f6;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-badge {
+            background: #e2e8f0;
+            color: #64748b;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-description {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(1, 1fr);
+        }
+
+        @media (min-width: 768px) {
+            .grid-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Logo Upload */
+        .logo-upload {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-preview {
+            width: 96px;
+            height: 96px;
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            position: relative;
+        }
+
+        .logo-preview:hover {
+            border-color: #3b82f6;
+        }
+
+        .logo-preview.has-logo {
+            border-style: solid;
+            border-color: #e2e8f0;
+        }
+
+        .logo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 0.5rem;
+        }
+
+        .logo-remove {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        /* Student List */
+        .student-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .student-info {
+            flex: 1;
+        }
+
+        .student-name {
+            font-weight: 500;
+        }
+
+        .student-roll {
+            color: #64748b;
+            margin-left: 0.5rem;
+        }
+
+        .student-actions {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        /* Subject List */
+        .subject-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .subject-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #94a3b8;
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Attendance Sheet */
+        .sheet-container {
+            background: #f1f5f9;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            overflow-x: auto;
+        }
+
+        .attendance-sheet {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 15mm;
+            margin: 0 auto 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .sheet-header {
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .sheet-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-right: 1rem;
+        }
+
+        .sheet-logo-placeholder {
+            width: 80px;
+            height: 80px;
+            border: 2px dashed #d1d5db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .sheet-header-text {
+            flex: 1;
+            text-align: center;
+        }
+
+        .sheet-institution {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .sheet-exam {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .sheet-subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .sheet-info {
+            border: 2px solid #000;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .sheet-info-row {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sheet-info-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        .sheet-info-item {
+            flex: 1;
+        }
+
+        .sheet-info-label {
+            font-weight: 600;
+        }
+
+        .sheet-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .sheet-table th,
+        .sheet-table td {
+            border: 1px solid #000;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .sheet-table th {
+            background: #e5e7eb;
+            font-weight: 600;
+        }
+
+        .sheet-table td:nth-child(2) {
+            text-align: left;
+            padding-left: 0.5rem;
+        }
+
+        .signature-box {
+            height: 35px;
+            border: 1px solid #9ca3af;
+        }
+
+        .sheet-footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 0.75rem;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: 1rem;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert-danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 2000;
+        }
+
+        .toast {
+            background: #1e293b;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success {
+            background: #16a34a;
+        }
+
+        .toast.error {
+            background: #dc2626;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Select */
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* Separator */
+        .separator {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 1rem 0;
+        }
+
+        /* Button Group */
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+
+            .attendance-sheet {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                page-break-after: always;
+            }
+
+            .attendance-sheet:last-child {
+                page-break-after: auto;
+            }
+
+            .sheet-container {
+                background: none !important;
+                padding: 0 !important;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 800px) {
+            .attendance-sheet {
+                width: 100%;
+                min-height: auto;
+                padding: 10mm;
+            }
+
+            .header-actions {
+                flex-wrap: wrap;
+            }
+
+            .tab-list {
+                justify-content: center;
+            }
+
+            .tab-btn span {
+                display: none;
+            }
+
+            .tab-btn svg {
+                margin: 0;
+            }
+        }
     </style>
 </head>
 <body>
-
-<div id="loginOverlay">
-    <div class="login-box">
-        <h3>প্রবেশাধিকার</h3>
-        <input type="password" id="passInput" class="input-field" style="width: 100%; margin-bottom: 15px; box-sizing: border-box;" placeholder="পাসওয়ার্ড" onkeypress="if(event.key === 'Enter') checkPassword()">
-        <button class="btn btn-blue" style="width: 100%;" onclick="checkPassword()">প্রবেশ করুন</button>
-    </div>
-</div>
-
-<div id="mainDashboard" style="display: none;">
-    <div class="control-box no-print">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-            <h2 style="margin: 0; color: #007bff;">Secure Dashboard</h2>
-            <div>
-                <button class="btn btn-black" onclick="changePassword()">পাসওয়ার্ড পরিবর্তন</button>
-                <button class="btn btn-red" onclick="logout()">লগআউট</button>
+    <!-- Login Overlay -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box">
+            <div class="login-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
             </div>
-        </div>
-        
-        <div class="input-group">
-            <label>লোগো আপলোড</label><br>
-            <input type="file" id="logoUpload" accept="image/*" class="input-field" style="width: 180px;" onchange="handleLogo(this)">
-        </div>
-        <div class="input-group"><label>প্রতিষ্ঠানের নাম</label><br><input type="text" id="instName" class="input-field" style="width: 200px;" oninput="saveData()"></div>
-        <div class="input-group"><label>পরীক্ষার নাম</label><br><input type="text" id="examName" class="input-field" style="width: 150px;" oninput="saveData()"></div>
-        <div class="input-group"><label>শ্রেণি/শাখা/বিভাগ</label><br>
-            <input type="text" id="className" placeholder="শ্রেণি" class="input-field" style="width: 60px;" oninput="saveData()">
-            <input type="text" id="sectionName" placeholder="শাখা" class="input-field" style="width: 60px;" oninput="saveData()">
-            <input type="text" id="deptName" placeholder="বিভাগ" class="input-field" style="width: 100px;" oninput="saveData()">
-        </div>
-
-        <div style="display: flex; gap: 15px; max-width: 1000px; margin: 10px auto;">
-            <div style="flex: 1.5; text-align: left;">
-                <label style="font-weight: bold;">ছাত্র-ছাত্রীর ডাটা (নাম রোল):</label><br>
-                <textarea id="studentData" class="full-textarea" oninput="saveData()"></textarea>
+            <h1 class="login-title">হাজিরা শীট</h1>
+            <p id="loginSubtitle" class="login-subtitle">প্রথমবার? পাসওয়ার্ড সেট করুন</p>
+            
+            <!-- First Time Setup -->
+            <div id="setupForm">
+                <div class="form-group">
+                    <label class="form-label">নতুন পাসওয়ার্ড</label>
+                    <input type="password" id="newPassword" class="form-input" placeholder="পাসওয়ার্ড লিখুন">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">পাসওয়ার্ড নিশ্চিত করুন</label>
+                    <input type="password" id="confirmPassword" class="form-input" placeholder="আবার পাসওয়ার্ড লিখুন">
+                </div>
+                <button class="btn btn-primary btn-full" onclick="setupPassword()">পাসওয়ার্ড সেট করুন</button>
             </div>
-            <div style="flex: 1; text-align: left;">
-                <label style="font-weight: bold;">বিষয়ের তালিকা (তারিখ সহ):</label><br>
-                <textarea id="subjectList" class="full-textarea" oninput="saveData()"></textarea>
-            </div>
-        </div>
 
-        <div>
-            <button class="btn btn-blue" onclick="generateSheets()">তৈরি করুন</button>
-            <button class="btn btn-green" onclick="window.print()">প্রিন্ট করুন</button>
-            <button class="btn btn-orange" onclick="exportJSON()">ব্যাকআপ (Backup)</button>
-            <button class="btn btn-gray" onclick="document.getElementById('importFile').click()">রিস্টোর (Restore)</button>
-            <button class="btn btn-red" onclick="clearAllData()">সব মুছুন</button>
-            <input type="file" id="importFile" style="display:none" onchange="importJSON(event)">
+            <!-- Login Form -->
+            <div id="loginForm" class="hidden">
+                <div class="form-group">
+                    <label class="form-label">পাসওয়ার্ড</label>
+                    <input type="password" id="loginPassword" class="form-input" placeholder="পাসওয়ার্ড লিখুন" onkeypress="if(event.key==='Enter')login()">
+                </div>
+                <button class="btn btn-primary btn-full" onclick="login()">প্রবেশ করুন</button>
+            </div>
         </div>
     </div>
-    <div id="sheetContainer" class="sheet-container"></div>
-</div>
 
-<script>
-    let masterPass = localStorage.getItem('master_password');
-    let logoBase64 = localStorage.getItem('school_logo') || "";
+    <!-- Main Dashboard -->
+    <div id="mainDashboard" class="hidden">
+        <!-- Header -->
+        <header class="header no-print">
+            <div class="header-content">
+                <h1 class="header-title">হাজিরা শীট</h1>
+                <div class="header-actions">
+                    <button class="btn btn-ghost btn-sm" onclick="showChangePasswordModal()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        পাসওয়ার্ড পরিবর্তন
+                    </button>
+                    <button class="btn btn-ghost btn-sm" onclick="logout()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        লগআউট
+                    </button>
+                </div>
+            </div>
+        </header>
 
-    function checkPassword() {
-        const input = document.getElementById('passInput').value;
-        if(!masterPass) { localStorage.setItem('master_password', input); masterPass = input; }
-        if(input === masterPass) {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('mainDashboard').style.display = 'block';
-            init();
-        } else { alert("ভুল পাসওয়ার্ড!"); }
-    }
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Tabs -->
+            <div class="tabs no-print">
+                <div class="tab-list">
+                    <button class="tab-btn active" onclick="switchTab('settings')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span>প্রতিষ্ঠান সেটিংস</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('students')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <span>শিক্ষার্থী তথ্য</span>
+                        <span id="studentBadge" class="tab-badge hidden">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('subjects')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                        <span>বিষয় তালিকা</span>
+                        <span id="subjectBadge" class="tab-badge hidden">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('preview')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <span>প্রিভিউ</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('backup')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span>ব্যাকআপ</span>
+                    </button>
+                </div>
+            </div>
 
-    function handleLogo(input) {
-        if (input.files && input.files[0]) {
-            let reader = new FileReader();
-            reader.onload = function(e) {
-                logoBase64 = e.target.result;
-                localStorage.setItem('school_logo', logoBase64);
-                generateSheets();
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
+            <!-- Settings Tab -->
+            <div id="settingsTab" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">প্রতিষ্ঠানের তথ্য</h2>
+                        <p class="card-description">হাজিরা শীটে প্রদর্শনের জন্য প্রতিষ্ঠানের তথ্য দিন</p>
+                    </div>
+                    <div class="card-content">
+                        <!-- Logo Upload -->
+                        <div class="form-group">
+                            <label class="form-label">লোগো</label>
+                            <div class="logo-upload">
+                                <div id="logoPreview" class="logo-preview" onclick="document.getElementById('logoInput').click()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #9ca3af;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span style="font-size: 12px; color: #6b7280; margin-top: 4px;">আপলোড</span>
+                                </div>
+                                <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
+                            </div>
+                        </div>
 
-    function init() {
-        const saved = JSON.parse(localStorage.getItem('attendance_v5_data'));
-        if (saved) {
-            document.getElementById('instName').value = saved.instName || '';
-            document.getElementById('examName').value = saved.examName || '';
-            document.getElementById('className').value = saved.className || '';
-            document.getElementById('sectionName').value = saved.sectionName || '';
-            document.getElementById('deptName').value = saved.deptName || '';
-            document.getElementById('studentData').value = saved.studentData || '';
-            document.getElementById('subjectList').value = saved.subjectList || '';
-            generateSheets();
-        }
-    }
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label class="form-label">প্রতিষ্ঠানের নাম</label>
+                                <input type="text" id="instName" class="form-input" placeholder="উদাহরণ: উপজেলা মাধ্যমিক বিদ্যালয়" oninput="saveData()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">পরীক্ষার নাম</label>
+                                <input type="text" id="examName" class="form-input" placeholder="উদাহরণ: বার্ষিক পরীক্ষা ২০২৪" oninput="saveData()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">শ্রেণি</label>
+                                <input type="text" id="className" class="form-input" placeholder="উদাহরণ: দশম" oninput="saveData()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">শাখা</label>
+                                <input type="text" id="sectionName" class="form-input" placeholder="উদাহরণ: ক" oninput="saveData()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">বিভাগ (ঐচ্ছিক)</label>
+                                <input type="text" id="deptName" class="form-input" placeholder="উদাহরণ: বিজ্ঞান" oninput="saveData()">
+                            </div>
+                        </div>
 
-    function saveData() {
-        const data = {
-            instName: document.getElementById('instName').value,
-            examName: document.getElementById('examName').value,
-            className: document.getElementById('className').value,
-            sectionName: document.getElementById('sectionName').value,
-            deptName: document.getElementById('deptName').value,
-            studentData: document.getElementById('studentData').value,
-            subjectList: document.getElementById('subjectList').value
+                        <!-- Font Size Control -->
+                        <div class="separator"></div>
+                        <div class="form-group">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <label class="form-label" style="margin: 0;">প্রতিষ্ঠানের নামের ফন্ট সাইজ</label>
+                                <span id="fontSizeValue" style="font-size: 0.875rem; font-weight: 600; color: #3b82f6;">২.০ rem</span>
+                            </div>
+                            <input 
+                                type="range" 
+                                id="fontSizeSlider" 
+                                min="1" 
+                                max="3.5" 
+                                step="0.1" 
+                                value="2.0"
+                                oninput="updateFontSize(this.value)"
+                                style="width: 100%; height: 8px; border-radius: 4px; background: #e2e8f0; outline: none; cursor: pointer; accent-color: #3b82f6;"
+                            >
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #64748b; margin-top: 0.25rem;">
+                                <span>ছোট (১rem)</span>
+                                <span>বড় (৩.৫rem)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Tab -->
+            <div id="studentsTab" class="tab-content">
+                <div class="grid grid-2">
+                    <!-- Add Students -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">শিক্ষার্থী যোগ করুন</h2>
+                            <p class="card-description">একাধিক শিক্ষার্থী যোগ করতে প্রতি লাইনে "নাম রোল" ফরম্যাটে লিখুন</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <label class="form-label">একাধিক শিক্ষার্থী যোগ করতে প্রতি লাইনে "নাম রোল" ফরম্যাটে লিখুন (নাম সর্বোচ্চ ৫০ অক্ষর)</label>
+                            </div>
+                            <div class="form-group">
+                                <textarea id="studentTextInput" class="form-input form-textarea" placeholder="মোহাম্মদ আলী ১&#10;ফাতেমা খাতুন ২&#10;আব্দুল করিম ৩"></textarea>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-primary" onclick="addStudentsFromText()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    যোগ করুন
+                                </button>
+                                <button class="btn btn-outline" onclick="document.getElementById('csvInput').click()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                    </svg>
+                                    CSV আমদানি
+                                </button>
+                                <input type="file" id="csvInput" accept=".csv,.txt" style="display:none" onchange="importCSV(this)">
+                            </div>
+
+                            <div class="separator"></div>
+
+                            <div class="form-group">
+                                <label class="form-label">একক শিক্ষার্থী যোগ</label>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <input type="text" id="singleStudentName" class="form-input" placeholder="নাম (সর্বোচ্চ ৫০ অক্ষর)" maxlength="50" style="flex:1">
+                                    <input type="text" id="singleStudentRoll" class="form-input" placeholder="রোল" style="width:100px">
+                                    <button class="btn btn-primary" onclick="addSingleStudent()">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student List -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                শিক্ষার্থী তালিকা
+                                <span id="studentCount" style="font-size: 0.875rem; font-weight: normal; color: #64748b; margin-left: 0.5rem;"></span>
+                            </h2>
+                        </div>
+                        <div class="card-content">
+                            <div id="studentList" class="student-list">
+                                <div class="empty-state">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                    <p>কোনো শিক্ষার্থী যোগ করা হয়নি</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subjects Tab -->
+            <div id="subjectsTab" class="tab-content">
+                <div class="grid grid-2">
+                    <!-- Add Subject -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">বিষয় যোগ করুন</h2>
+                            <p class="card-description">পরীক্ষার বিষয়সমূহ ও তারিখ যোগ করুন</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <label class="form-label">বিষয়ের নাম</label>
+                                <input type="text" id="subjectName" class="form-input" placeholder="উদাহরণ: বাংলা">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">তারিখ</label>
+                                <input type="date" id="subjectDate" class="form-input">
+                            </div>
+                            <button class="btn btn-primary btn-full" onclick="addSubject()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                                বিষয় যোগ করুন
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Subject List -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                বিষয় তালিকা
+                                <span id="subjectCount" style="font-size: 0.875rem; font-weight: normal; color: #64748b; margin-left: 0.5rem;"></span>
+                            </h2>
+                        </div>
+                        <div class="card-content">
+                            <div id="subjectList" class="subject-list">
+                                <div class="empty-state">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                    <p>কোনো বিষয় যোগ করা হয়নি</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Tab -->
+            <div id="previewTab" class="tab-content">
+                <div class="card no-print">
+                    <div class="card-header">
+                        <h2 class="card-title">হাজিরা শীট প্রিভিউ</h2>
+                        <p class="card-description">শিক্ষার্থীদের হাজিরা শীট দেখুন এবং প্রিন্ট করুন</p>
+                    </div>
+                    <div class="card-content">
+                        <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <label class="form-label" style="margin: 0;">শিক্ষার্থী নির্বাচন:</label>
+                                <select id="previewSelect" class="form-select" style="width: 250px;" onchange="updatePreview()">
+                                    <option value="all">সব শিক্ষার্থী</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-success" onclick="window.print()" style="margin-left: auto;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                </svg>
+                                প্রিন্ট করুন
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="previewContainer" class="sheet-container">
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p>প্রিভিউ দেখতে শিক্ষার্থী ও বিষয় যোগ করুন</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backup Tab -->
+            <div id="backupTab" class="tab-content">
+                <div class="grid grid-2">
+                    <!-- Export -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display: inline; vertical-align: middle; margin-right: 0.5rem;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                ব্যাকআপ এক্সপোর্ট
+                            </h2>
+                            <p class="card-description">সব ডেটা JSON ফাইল হিসেবে সংরক্ষণ করুন</p>
+                        </div>
+                        <div class="card-content">
+                            <button class="btn btn-primary btn-full" onclick="exportData()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                ব্যাকআপ ডাউনলোড করুন
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Import -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display: inline; vertical-align: middle; margin-right: 0.5rem;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                ব্যাকআপ রিস্টোর
+                            </h2>
+                            <p class="card-description">পূর্বে সংরক্ষিত JSON ফাইল থেকে ডেটা রিস্টোর করুন</p>
+                        </div>
+                        <div class="card-content">
+                            <button class="btn btn-outline btn-full" onclick="document.getElementById('importInput').click()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                JSON ফাইল থেকে রিস্টোর
+                            </button>
+                            <input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="card" style="border: 1px solid #fca5a5;">
+                    <div class="card-header" style="background: #fef2f2;">
+                        <h2 class="card-title" style="color: #dc2626;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display: inline; vertical-align: middle; margin-right: 0.5rem;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            বিপদজনক অঞ্চল
+                        </h2>
+                        <p class="card-description">এই ক্রিয়া পূর্বাবস্থায় ফেরানো যাবে না</p>
+                    </div>
+                    <div class="card-content">
+                        <button class="btn btn-danger" onclick="confirmClearAll()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            সব ডেটা মুছুন
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="header no-print" style="text-align: center; margin-top: 2rem;">
+            <p style="color: #64748b; font-size: 0.875rem;">হাজিরা শীট - উন্নত সংস্করণ | তৈরি করা হয়েছে ❤️ দিয়ে</p>
+        </footer>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="passwordModal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">পাসওয়ার্ড পরিবর্তন</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">বর্তমান পাসওয়ার্ড</label>
+                    <input type="password" id="currentPassword" class="form-input" placeholder="বর্তমান পাসওয়ার্ড">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">নতুন পাসওয়ার্ড</label>
+                    <input type="password" id="changeNewPassword" class="form-input" placeholder="নতুন পাসওয়ার্ড">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">নিশ্চিত করুন</label>
+                    <input type="password" id="changeConfirmPassword" class="form-input" placeholder="আবার লিখুন">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="hidePasswordModal()">বাতিল</button>
+                <button class="btn btn-primary" onclick="changePassword()">পরিবর্তন করুন</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+        // Storage Keys
+        const STORAGE_KEYS = {
+            PASSWORD: 'hajira_password_v2',
+            SETTINGS: 'hajira_settings_v2',
+            STUDENTS: 'hajira_students_v2',
+            SUBJECTS: 'hajira_subjects_v2'
         };
-        localStorage.setItem('attendance_v5_data', JSON.stringify(data));
-        generateSheets();
-    }
 
-    function generateSheets() {
-        const inst = document.getElementById('instName').value || "প্রতিষ্ঠানের নাম";
-        const exam = document.getElementById('examName').value || "পরীক্ষার নাম";
-        const cls = document.getElementById('className').value || "........";
-        const sec = document.getElementById('sectionName').value.trim();
-        const dept = document.getElementById('deptName').value.trim();
-        
-        const rawLines = document.getElementById('studentData').value.split('\n').filter(line => line.trim() !== "");
-        const subjectsRaw = document.getElementById('subjectList').value.split(',').filter(s => s.trim() !== "");
-        const subjectsData = subjectsRaw.map(s => {
-            let match = s.match(/(.+?)\s*\((.+?)\)/);
-            return match ? { name: match[1].trim(), date: match[2].trim() } : { name: s.trim(), date: "" };
-        });
+        // State
+        let settings = {
+            logo: '',
+            institutionName: '',
+            examName: '',
+            className: '',
+            section: '',
+            department: '',
+            fontSize: 2.0 // Font size in rem
+        };
+        let students = [];
+        let subjects = [];
 
-        const container = document.getElementById('sheetContainer');
-        container.innerHTML = "";
+        // Utility Functions
+        function generateId() {
+            return Math.random().toString(36).substring(2, 9);
+        }
 
-        rawLines.forEach((line) => {
-            let parts = line.split(/(\s+)/).filter(p => p.trim().length > 0);
-            if(parts.length < 1) return;
-            let roll = parts.pop();
-            let name = parts.join(" ");
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash.toString(16);
+        }
 
-            let tableRows = "";
-            subjectsData.forEach((sub, idx) => {
-                tableRows += `<tr><td>${idx+1}</td><td style="text-align:left; padding-left:8px;">${sub.name}</td><td>${sub.date}</td><td class="box-empty"></td><td class="box-empty"></td></tr>`;
-            });
+        // Convert English digits to Bengali
+        function toBengaliDigits(num) {
+            const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+            return String(num).replace(/[0-9]/g, d => bengaliDigits[parseInt(d)]);
+        }
 
-            let logoHtml = logoBase64 ? `<img src="${logoBase64}" class="logo-img">` : `<div style="width:80px;"></div>`;
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
 
-            // বিভাগ হাইড লজিক
-            let deptHtml = dept !== "" ? `বিভাগ: ${dept}` : "";
+        // Authentication
+        function setupPassword() {
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
 
-            container.innerHTML += `
-                <div class="student-page">
-                    <div class="header">
-                        ${logoHtml}
-                        <div class="header-text">
-                            <h2>${inst}</h2>
-                            <h3>${exam}</h3>
-                            <p style="margin:2px 0;">ব্যক্তিগত হাজিরা ও উত্তরপত্র সংগ্রহের রেকর্ড</p>
-                        </div>
-                    </div>
-                    <div class="info-container">
-                        <div class="info-row">
-                            <div class="col-main">নাম: ${name}</div>
-                            <div class="col-side">রোল নম্বর: ${roll}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="col-main">শ্রেণি: ${cls} ${sec ? '| শাখা: '+sec : ''}</div>
-                            <div class="col-side">${deptHtml}</div>
-                        </div>
-                    </div>
-                    <table>
-                        <thead><tr><th width="7%">ক্র.নং</th><th width="33%">বিষয়ের নাম</th><th width="14%">তারিখ</th><th width="23%">শিক্ষার্থীর স্বাক্ষর</th><th width="23%">পরিদর্শকের স্বাক্ষর</th></tr></thead>
-                        <tbody>${tableRows}</tbody>
-                    </table>
-                </div>`;
-        });
-    }
+            if (newPass.length < 4) {
+                showToast('পাসওয়ার্ড কমপক্ষে ৪ অক্ষর হতে হবে', 'error');
+                return;
+            }
+            if (newPass !== confirmPass) {
+                showToast('পাসওয়ার্ড মিলছে না', 'error');
+                return;
+            }
 
-    function changePassword() {
-        const old = prompt("বর্তমান পাসওয়ার্ড:");
-        if (old === masterPass) {
-            const newP = prompt("নতুন পাসওয়ার্ড (৪ অক্ষর):");
-            if (newP && newP.length >= 4) {
-                localStorage.setItem('master_password', newP);
-                masterPass = newP;
-                alert("পরিবর্তন হয়েছে!");
+            const hash = hashPassword(newPass);
+            localStorage.setItem(STORAGE_KEYS.PASSWORD, JSON.stringify({ hash, createdAt: new Date().toISOString() }));
+            showToast('পাসওয়ার্ড সেট করা হয়েছে');
+            showDashboard();
+        }
+
+        function login() {
+            const password = document.getElementById('loginPassword').value;
+            const stored = localStorage.getItem(STORAGE_KEYS.PASSWORD);
+            
+            if (!stored) {
+                showToast('পাসওয়ার্ড সেট করা নেই', 'error');
+                return;
+            }
+
+            const { hash } = JSON.parse(stored);
+            if (hashPassword(password) === hash) {
+                showToast('স্বাগতম!');
+                showDashboard();
+            } else {
+                showToast('ভুল পাসওয়ার্ড', 'error');
             }
         }
-    }
 
-    function exportJSON() {
-        const data = localStorage.getItem('attendance_v5_data');
-        if(!data) { alert("কোনো ডাটা নেই!"); return; }
-        const blob = new Blob([data], {type: 'application/json'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'attendance_backup.json';
-        a.click();
-    }
+        function logout() {
+            document.getElementById('loginOverlay').classList.remove('hidden');
+            document.getElementById('mainDashboard').classList.add('hidden');
+            document.getElementById('loginPassword').value = '';
+            showToast('লগআউট করা হয়েছে');
+        }
 
-    function importJSON(e) {
-        const reader = new FileReader();
-        reader.onload = (f) => {
-            localStorage.setItem('attendance_v5_data', f.target.result);
-            init();
-            alert("সব ডাটা রিস্টোর হয়েছে!");
-        };
-        reader.readAsText(e.target.files[0]);
-    }
+        function showChangePasswordModal() {
+            document.getElementById('passwordModal').classList.remove('hidden');
+        }
 
-    function logout() { location.reload(); }
-    function clearAllData() { if(confirm("সব মুছে যাবে?")) { localStorage.clear(); location.reload(); } }
-</script>
+        function hidePasswordModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('changeNewPassword').value = '';
+            document.getElementById('changeConfirmPassword').value = '';
+        }
+
+        function changePassword() {
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('changeNewPassword').value;
+            const confirmPass = document.getElementById('changeConfirmPassword').value;
+
+            const stored = localStorage.getItem(STORAGE_KEYS.PASSWORD);
+            if (!stored) return;
+
+            const { hash } = JSON.parse(stored);
+            if (hashPassword(current) !== hash) {
+                showToast('বর্তমান পাসওয়ার্ড ভুল', 'error');
+                return;
+            }
+            if (newPass.length < 4) {
+                showToast('নতুন পাসওয়ার্ড কমপক্ষে ৪ অক্ষর হতে হবে', 'error');
+                return;
+            }
+            if (newPass !== confirmPass) {
+                showToast('নতুন পাসওয়ার্ড মিলছে না', 'error');
+                return;
+            }
+
+            localStorage.setItem(STORAGE_KEYS.PASSWORD, JSON.stringify({ hash: hashPassword(newPass), createdAt: new Date().toISOString() }));
+            hidePasswordModal();
+            showToast('পাসওয়ার্ড পরিবর্তন করা হয়েছে');
+        }
+
+        function showDashboard() {
+            document.getElementById('loginOverlay').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            loadData();
+        }
+
+        // Data Management
+        function loadData() {
+            // Load settings
+            const settingsData = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+            if (settingsData) {
+                settings = JSON.parse(settingsData);
+                document.getElementById('instName').value = settings.institutionName || '';
+                document.getElementById('examName').value = settings.examName || '';
+                document.getElementById('className').value = settings.className || '';
+                document.getElementById('sectionName').value = settings.section || '';
+                document.getElementById('deptName').value = settings.department || '';
+                if (settings.logo) {
+                    updateLogoPreview(settings.logo);
+                }
+                // Initialize font size slider
+                initFontSizeSlider();
+            }
+
+            // Load students
+            const studentsData = localStorage.getItem(STORAGE_KEYS.STUDENTS);
+            if (studentsData) {
+                students = JSON.parse(studentsData);
+            }
+
+            // Load subjects
+            const subjectsData = localStorage.getItem(STORAGE_KEYS.SUBJECTS);
+            if (subjectsData) {
+                subjects = JSON.parse(subjectsData);
+            }
+
+            updateStudentList();
+            updateSubjectList();
+            updatePreviewSelect();
+        }
+
+        function saveData() {
+            settings.institutionName = document.getElementById('instName').value;
+            settings.examName = document.getElementById('examName').value;
+            settings.className = document.getElementById('className').value;
+            settings.section = document.getElementById('sectionName').value;
+            settings.department = document.getElementById('deptName').value;
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+        }
+
+        // Font Size Control
+        function updateFontSize(value) {
+            settings.fontSize = parseFloat(value);
+            saveData();
+            
+            // Update display value
+            const displayValue = document.getElementById('fontSizeValue');
+            if (displayValue) {
+                displayValue.textContent = toBengaliDigits(parseFloat(value).toFixed(1)) + ' rem';
+            }
+        }
+
+        function initFontSizeSlider() {
+            const slider = document.getElementById('fontSizeSlider');
+            const displayValue = document.getElementById('fontSizeValue');
+            const currentSize = settings.fontSize || 2.0;
+            
+            if (slider) {
+                slider.value = currentSize;
+            }
+            if (displayValue) {
+                displayValue.textContent = toBengaliDigits(currentSize.toFixed(1)) + ' rem';
+            }
+        }
+
+        // Logo
+        function handleLogoUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                showToast('শুধুমাত্র ছবি আপলোড করতে পারবেন', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                settings.logo = e.target.result;
+                updateLogoPreview(settings.logo);
+                saveData();
+                showToast('লোগো আপলোড করা হয়েছে');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateLogoPreview(logoSrc) {
+            const preview = document.getElementById('logoPreview');
+            preview.classList.add('has-logo');
+            preview.innerHTML = `
+                <img src="${logoSrc}" alt="লোগো">
+                <button class="logo-remove" onclick="removeLogo(event)">✕</button>
+            `;
+        }
+
+        function removeLogo(event) {
+            event.stopPropagation();
+            settings.logo = '';
+            const preview = document.getElementById('logoPreview');
+            preview.classList.remove('has-logo');
+            preview.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #9ca3af;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span style="font-size: 12px; color: #6b7280; margin-top: 4px;">আপলোড</span>
+            `;
+            saveData();
+            showToast('লোগো মুছে ফেলা হয়েছে');
+        }
+
+        // Students
+        function addStudentsFromText() {
+            const text = document.getElementById('studentTextInput').value.trim();
+            if (!text) {
+                showToast('শিক্ষার্থীর তথ্য লিখুন', 'error');
+                return;
+            }
+
+            const lines = text.split('\n').filter(line => line.trim());
+            let added = 0;
+            let rollCounter = students.length + 1; // Start from current count + 1
+            
+            lines.forEach((line) => {
+                const parts = line.trim().split(/\s+/);
+                if (parts.length >= 2) {
+                    // Check if last part is a roll number (numeric or Bengali number)
+                    const lastPart = parts[parts.length - 1];
+                    const isRollNumber = /^[\d০-৯]+$/.test(lastPart);
+                    
+                    if (isRollNumber) {
+                        // Last part is roll number
+                        const roll = parts.pop();
+                        const name = parts.join(' ').substring(0, 50);
+                        students.push({ id: generateId(), name, roll });
+                    } else {
+                        // No roll number, generate sequential roll
+                        const name = parts.join(' ').substring(0, 50);
+                        students.push({ id: generateId(), name, roll: rollCounter.toString() });
+                        rollCounter++;
+                    }
+                    added++;
+                } else if (parts.length === 1) {
+                    students.push({ id: generateId(), name: parts[0].substring(0, 50), roll: rollCounter.toString() });
+                    rollCounter++;
+                    added++;
+                }
+            });
+
+            document.getElementById('studentTextInput').value = '';
+            localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(students));
+            updateStudentList();
+            updatePreviewSelect();
+            showToast(`${toBengaliDigits(added)} জন শিক্ষার্থী যোগ করা হয়েছে`);
+        }
+
+        function addSingleStudent() {
+            const name = document.getElementById('singleStudentName').value.trim().substring(0, 50);
+            const roll = document.getElementById('singleStudentRoll').value.trim();
+
+            if (!name || !roll) {
+                showToast('নাম ও রোল দিন', 'error');
+                return;
+            }
+
+            students.push({ id: generateId(), name, roll });
+            localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(students));
+            
+            document.getElementById('singleStudentName').value = '';
+            document.getElementById('singleStudentRoll').value = '';
+            
+            updateStudentList();
+            updatePreviewSelect();
+            showToast('শিক্ষার্থী যোগ করা হয়েছে');
+        }
+
+        function deleteStudent(id) {
+            if (!confirm('আপনি কি এই শিক্ষার্থীকে মুছে ফেলতে চান?')) return;
+            
+            students = students.filter(s => s.id !== id);
+            localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(students));
+            updateStudentList();
+            updatePreviewSelect();
+            showToast('শিক্ষার্থী মুছে ফেলা হয়েছে');
+        }
+
+        function importCSV(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const text = e.target.result;
+                const lines = text.split('\n').filter(line => line.trim());
+                let added = 0;
+                let rollCounter = students.length + 1;
+                
+                lines.forEach((line) => {
+                    const parts = line.trim().split(/\s+/);
+                    if (parts.length >= 2) {
+                        // Check if last part is a roll number (numeric or Bengali number)
+                        const lastPart = parts[parts.length - 1];
+                        const isRollNumber = /^[\d০-৯]+$/.test(lastPart);
+                        
+                        if (isRollNumber) {
+                            const roll = parts.pop();
+                            const name = parts.join(' ').substring(0, 50);
+                            students.push({ id: generateId(), name, roll });
+                        } else {
+                            const name = parts.join(' ').substring(0, 50);
+                            students.push({ id: generateId(), name, roll: rollCounter.toString() });
+                            rollCounter++;
+                        }
+                        added++;
+                    }
+                });
+
+                localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(students));
+                updateStudentList();
+                updatePreviewSelect();
+                showToast(`${toBengaliDigits(added)} জন শিক্ষার্থী আমদানি করা হয়েছে`);
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        function updateStudentList() {
+            const container = document.getElementById('studentList');
+            const badge = document.getElementById('studentBadge');
+            const count = document.getElementById('studentCount');
+
+            if (students.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <p>কোনো শিক্ষার্থী যোগ করা হয়নি</p>
+                    </div>
+                `;
+                badge.classList.add('hidden');
+                count.textContent = '';
+            } else {
+                container.innerHTML = students.map(s => `
+                    <div class="student-item">
+                        <div class="student-info">
+                            <span class="student-name">${s.name}</span>
+                            <span class="student-roll">রোল: ${toBengaliDigits(s.roll)}</span>
+                        </div>
+                        <div class="student-actions">
+                            <button class="btn btn-ghost btn-icon" onclick="deleteStudent('${s.id}')" title="মুছুন">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #ef4444;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                badge.textContent = toBengaliDigits(students.length);
+                badge.classList.remove('hidden');
+                count.textContent = `(${toBengaliDigits(students.length)} জন)`;
+            }
+        }
+
+        // Subjects
+        function addSubject() {
+            const name = document.getElementById('subjectName').value.trim();
+            const date = document.getElementById('subjectDate').value;
+
+            if (!name) {
+                showToast('বিষয়ের নাম দিন', 'error');
+                return;
+            }
+
+            subjects.push({ id: generateId(), name, date });
+            localStorage.setItem(STORAGE_KEYS.SUBJECTS, JSON.stringify(subjects));
+
+            document.getElementById('subjectName').value = '';
+            document.getElementById('subjectDate').value = '';
+
+            updateSubjectList();
+            showToast('বিষয় যোগ করা হয়েছে');
+        }
+
+        function deleteSubject(id) {
+            if (!confirm('আপনি কি এই বিষয়টি মুছে ফেলতে চান?')) return;
+            
+            subjects = subjects.filter(s => s.id !== id);
+            localStorage.setItem(STORAGE_KEYS.SUBJECTS, JSON.stringify(subjects));
+            updateSubjectList();
+            showToast('বিষয় মুছে ফেলা হয়েছে');
+        }
+
+        function updateSubjectList() {
+            const container = document.getElementById('subjectList');
+            const badge = document.getElementById('subjectBadge');
+            const count = document.getElementById('subjectCount');
+
+            if (subjects.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                        <p>কোনো বিষয় যোগ করা হয়নি</p>
+                    </div>
+                `;
+                badge.classList.add('hidden');
+                count.textContent = '';
+            } else {
+                container.innerHTML = subjects.map(s => `
+                    <div class="subject-item">
+                        <div>
+                            <span style="font-weight: 500;">${s.name}</span>
+                            <span style="color: #64748b; margin-left: 0.5rem;">${formatDate(s.date)}</span>
+                        </div>
+                        <div style="display: flex; gap: 0.25rem;">
+                            <button class="btn btn-ghost btn-icon" onclick="deleteSubject('${s.id}')" title="মুছুন">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #ef4444;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                badge.textContent = toBengaliDigits(subjects.length);
+                badge.classList.remove('hidden');
+                count.textContent = `(${toBengaliDigits(subjects.length)}টি বিষয়)`;
+            }
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            const day = toBengaliDigits(String(date.getDate()).padStart(2, '0'));
+            const month = toBengaliDigits(String(date.getMonth() + 1).padStart(2, '0'));
+            const year = toBengaliDigits(date.getFullYear());
+            return `${day}/${month}/${year}`;
+        }
+
+        // Tabs
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+
+            // Update preview if switching to preview tab
+            if (tabName === 'preview') {
+                updatePreview();
+            }
+        }
+
+        // Preview
+        function updatePreviewSelect() {
+            const select = document.getElementById('previewSelect');
+            select.innerHTML = '<option value="all">সব শিক্ষার্থী</option>';
+            students.forEach((s, index) => {
+                select.innerHTML += `<option value="${index}">${s.name} (রোল: ${toBengaliDigits(s.roll)})</option>`;
+            });
+        }
+
+        function updatePreview() {
+            const container = document.getElementById('previewContainer');
+            const selectValue = document.getElementById('previewSelect').value;
+
+            if (students.length === 0 || subjects.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p>${students.length === 0 ? 'প্রিভিউ দেখতে শিক্ষার্থী যোগ করুন' : 'প্রিভিউ দেখতে বিষয় যোগ করুন'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let studentsToShow = selectValue === 'all' ? students : [students[parseInt(selectValue)]];
+            
+            container.innerHTML = studentsToShow.map(student => createSheetHTML(student)).join('');
+        }
+
+        function createSheetHTML(student) {
+            const logoHTML = settings.logo 
+                ? `<img src="${settings.logo}" class="sheet-logo" alt="লোগো">`
+                : `<div class="sheet-logo-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #9ca3af;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                   </div>`;
+
+            const fontSize = settings.fontSize || 2.0;
+
+            const rows = subjects.map((s, index) => `
+                <tr>
+                    <td>${toBengaliDigits(index + 1)}</td>
+                    <td style="text-align: left; padding-left: 8px;">${s.name}</td>
+                    <td>${formatDate(s.date)}</td>
+                    <td style="height: 35px;"></td>
+                    <td style="height: 35px;"></td>
+                </tr>
+            `).join('');
+
+            return `
+                <div class="attendance-sheet">
+                    <div class="sheet-header">
+                        ${logoHTML}
+                        <div class="sheet-header-text">
+                            <h1 class="sheet-institution" style="font-size: ${fontSize}rem;">${settings.institutionName || 'প্রতিষ্ঠানের নাম'}</h1>
+                            <h2 class="sheet-exam">${settings.examName || 'পরীক্ষার নাম'}</h2>
+                            <p class="sheet-subtitle">ব্যক্তিগত হাজিরা ও উত্তরপত্র সংগ্রহের রেকর্ড</p>
+                        </div>
+                    </div>
+                    
+                    <div class="sheet-info">
+                        <div class="sheet-info-row">
+                            <div class="sheet-info-item"><span class="sheet-info-label">নাম:</span> ${student.name}</div>
+                            <div class="sheet-info-item"><span class="sheet-info-label">রোল নম্বর:</span> ${toBengaliDigits(student.roll)}</div>
+                        </div>
+                        <div class="sheet-info-row">
+                            <div class="sheet-info-item"><span class="sheet-info-label">শ্রেণি:</span> ${settings.className || '-'} ${settings.section ? '| শাখা: ' + settings.section : ''}</div>
+                            <div class="sheet-info-item">${settings.department ? '<span class="sheet-info-label">বিভাগ:</span> ' + settings.department : ''}</div>
+                        </div>
+                    </div>
+
+                    <table class="sheet-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 7%;">ক্র.নং</th>
+                                <th style="width: 33%;">বিষয়ের নাম</th>
+                                <th style="width: 14%;">তারিখ</th>
+                                <th style="width: 23%;">শিক্ষার্থীর স্বাক্ষর</th>
+                                <th style="width: 23%;">পরিদর্শকের স্বাক্ষর</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+
+                    <div class="sheet-footer">
+                        <p>হাজিরা শীট - তৈরি করা হয়েছে ${new Date().toLocaleDateString('bn-BD')} তারিখে</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Export/Import
+        function exportData() {
+            const data = {
+                settings,
+                students,
+                subjects,
+                exportedAt: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `hajira-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('ব্যাকআপ ডাউনলোড হচ্ছে');
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.settings) {
+                        settings = data.settings;
+                        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+                    }
+                    if (data.students) {
+                        // Limit names to 50 characters when importing
+                        students = data.students.map(s => ({
+                            ...s,
+                            name: s.name.substring(0, 50)
+                        }));
+                        localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(students));
+                    }
+                    if (data.subjects) {
+                        subjects = data.subjects;
+                        localStorage.setItem(STORAGE_KEYS.SUBJECTS, JSON.stringify(subjects));
+                    }
+
+                    loadData();
+                    showToast('ডেটা রিস্টোর করা হয়েছে');
+                } catch {
+                    showToast('অবৈধ ফাইল ফরম্যাট', 'error');
+                }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        function confirmClearAll() {
+            if (!confirm('আপনি কি নিশ্চিত? সব ডেটা মুছে যাবে এবং এটি পূর্বাবস্থায় ফেরানো যাবে না।')) return;
+            
+            localStorage.removeItem(STORAGE_KEYS.SETTINGS);
+            localStorage.removeItem(STORAGE_KEYS.STUDENTS);
+            localStorage.removeItem(STORAGE_KEYS.SUBJECTS);
+            
+            settings = { logo: '', institutionName: '', examName: '', className: '', section: '', department: '', fontSize: 2.0 };
+            students = [];
+            subjects = [];
+            
+            // Reset form fields
+            document.getElementById('instName').value = '';
+            document.getElementById('examName').value = '';
+            document.getElementById('className').value = '';
+            document.getElementById('sectionName').value = '';
+            document.getElementById('deptName').value = '';
+            
+            // Reset logo
+            const preview = document.getElementById('logoPreview');
+            preview.classList.remove('has-logo');
+            preview.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #9ca3af;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span style="font-size: 12px; color: #6b7280; margin-top: 4px;">আপলোড</span>
+            `;
+            
+            // Reset font size slider
+            initFontSizeSlider();
+            
+            updateStudentList();
+            updateSubjectList();
+            updatePreviewSelect();
+            showToast('সব ডেটা মুছে ফেলা হয়েছে');
+        }
+
+        // Initialize
+        function init() {
+            const passwordData = localStorage.getItem(STORAGE_KEYS.PASSWORD);
+            
+            if (passwordData) {
+                // Password exists, show login
+                document.getElementById('setupForm').classList.add('hidden');
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('loginSubtitle').textContent = 'প্রবেশ করতে পাসওয়ার্ড দিন';
+            } else {
+                // No password, show setup
+                document.getElementById('setupForm').classList.remove('hidden');
+                document.getElementById('loginForm').classList.add('hidden');
+            }
+        }
+
+        // Run on load
+        init();
+    </script>
 </body>
 </html>
