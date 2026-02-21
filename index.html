@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>হাজিরা শীট - Attendance Sheet Generator</title>
+    <title>EDUME হাজিরা শীট - Attendance Sheet Generator</title>
     <style>
         /* Base Styles */
         * {
@@ -778,7 +778,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
             </div>
-            <h1 class="login-title">হাজিরা শীট</h1>
+            <h1 class="login-title">EDUME হাজিরা শীট</h1>
             <p id="loginSubtitle" class="login-subtitle">প্রথমবার? পাসওয়ার্ড সেট করুন</p>
             
             <!-- First Time Setup -->
@@ -810,7 +810,7 @@
         <!-- Header -->
         <header class="header no-print">
             <div class="header-content">
-                <h1 class="header-title">হাজিরা শীট</h1>
+                <h1 class="header-title">EDUME হাজিরা শীট</h1>
                 <div class="header-actions">
                     <button class="btn btn-ghost btn-sm" onclick="showChangePasswordModal()">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1169,7 +1169,7 @@
 
         <!-- Footer -->
         <footer class="header no-print" style="text-align: center; margin-top: 2rem;">
-            <p style="color: #64748b; font-size: 0.875rem;">হাজিরা শীট - উন্নত সংস্করণ | তৈরি করা হয়েছে ❤️ দিয়ে</p>
+            <p style="color: #64748b; font-size: 0.875rem;">EDUM ‘র তৈরী হাজিরা শীট - উন্নত সংস্করণ </p>
         </footer>
     </div>
 
@@ -1532,6 +1532,41 @@
             showToast('শিক্ষার্থী মুছে ফেলা হয়েছে');
         }
 
+        // Edit Student
+        let editingStudentId = null;
+        
+        function startEditStudent(id) {
+            editingStudentId = id;
+            updateStudentList();
+        }
+        
+        function cancelEditStudent() {
+            editingStudentId = null;
+            updateStudentList();
+        }
+        
+        function saveEditStudent(id) {
+            const nameInput = document.getElementById('editStudentName');
+            const rollInput = document.getElementById('editStudentRoll');
+            
+            if (!nameInput || !rollInput) return;
+            
+            const name = nameInput.value.trim().substring(0, 50);
+            const roll = rollInput.value.trim();
+            
+            if (!name || !roll) {
+                showToast('নাম ও রোল দিন', 'error');
+                return;
+            }
+            
+            students = students.map(s => s.id === id ? { ...s, name, roll } : s);
+            localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(students));
+            editingStudentId = null;
+            updateStudentList();
+            updatePreviewSelect();
+            showToast('শিক্ষার্থীর তথ্য আপডেট করা হয়েছে');
+        }
+
         function importCSV(input) {
             const file = input.files[0];
             if (!file) return;
@@ -1589,21 +1624,51 @@
                 badge.classList.add('hidden');
                 count.textContent = '';
             } else {
-                container.innerHTML = students.map(s => `
-                    <div class="student-item">
-                        <div class="student-info">
-                            <span class="student-name">${s.name}</span>
-                            <span class="student-roll">রোল: ${toBengaliDigits(s.roll)}</span>
-                        </div>
-                        <div class="student-actions">
-                            <button class="btn btn-ghost btn-icon" onclick="deleteStudent('${s.id}')" title="মুছুন">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #ef4444;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
+                container.innerHTML = students.map(s => {
+                    if (editingStudentId === s.id) {
+                        // Edit mode
+                        return `
+                            <div class="student-item" style="flex-wrap: wrap; gap: 0.5rem;">
+                                <input type="text" id="editStudentName" class="form-input" value="${s.name}" maxlength="50" style="flex: 1; min-width: 150px;">
+                                <input type="text" id="editStudentRoll" class="form-input" value="${s.roll}" style="width: 80px;">
+                                <div class="student-actions">
+                                    <button class="btn btn-success btn-icon" onclick="saveEditStudent('${s.id}')" title="সেভ করুন">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </button>
+                                    <button class="btn btn-ghost btn-icon" onclick="cancelEditStudent()" title="বাতিল">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #64748b;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Normal view
+                        return `
+                            <div class="student-item">
+                                <div class="student-info">
+                                    <span class="student-name">${s.name}</span>
+                                    <span class="student-roll">রোল: ${toBengaliDigits(s.roll)}</span>
+                                </div>
+                                <div class="student-actions">
+                                    <button class="btn btn-ghost btn-icon" onclick="startEditStudent('${s.id}')" title="সম্পাদনা">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #3b82f6;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </button>
+                                    <button class="btn btn-ghost btn-icon" onclick="deleteStudent('${s.id}')" title="মুছুন">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #ef4444;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }).join('');
                 badge.textContent = toBengaliDigits(students.length);
                 badge.classList.remove('hidden');
                 count.textContent = `(${toBengaliDigits(students.length)} জন)`;
@@ -1639,6 +1704,40 @@
             showToast('বিষয় মুছে ফেলা হয়েছে');
         }
 
+        // Edit Subject
+        let editingSubjectId = null;
+        
+        function startEditSubject(id) {
+            editingSubjectId = id;
+            updateSubjectList();
+        }
+        
+        function cancelEditSubject() {
+            editingSubjectId = null;
+            updateSubjectList();
+        }
+        
+        function saveEditSubject(id) {
+            const nameInput = document.getElementById('editSubjectName');
+            const dateInput = document.getElementById('editSubjectDate');
+            
+            if (!nameInput) return;
+            
+            const name = nameInput.value.trim();
+            const date = dateInput ? dateInput.value : '';
+            
+            if (!name) {
+                showToast('বিষয়ের নাম দিন', 'error');
+                return;
+            }
+            
+            subjects = subjects.map(s => s.id === id ? { ...s, name, date } : s);
+            localStorage.setItem(STORAGE_KEYS.SUBJECTS, JSON.stringify(subjects));
+            editingSubjectId = null;
+            updateSubjectList();
+            showToast('বিষয়ের তথ্য আপডেট করা হয়েছে');
+        }
+
         function updateSubjectList() {
             const container = document.getElementById('subjectList');
             const badge = document.getElementById('subjectBadge');
@@ -1656,21 +1755,51 @@
                 badge.classList.add('hidden');
                 count.textContent = '';
             } else {
-                container.innerHTML = subjects.map(s => `
-                    <div class="subject-item">
-                        <div>
-                            <span style="font-weight: 500;">${s.name}</span>
-                            <span style="color: #64748b; margin-left: 0.5rem;">${formatDate(s.date)}</span>
-                        </div>
-                        <div style="display: flex; gap: 0.25rem;">
-                            <button class="btn btn-ghost btn-icon" onclick="deleteSubject('${s.id}')" title="মুছুন">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #ef4444;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
+                container.innerHTML = subjects.map(s => {
+                    if (editingSubjectId === s.id) {
+                        // Edit mode
+                        return `
+                            <div class="subject-item" style="flex-wrap: wrap; gap: 0.5rem;">
+                                <input type="text" id="editSubjectName" class="form-input" value="${s.name}" placeholder="বিষয়ের নাম" style="flex: 1; min-width: 120px;">
+                                <input type="date" id="editSubjectDate" class="form-input" value="${s.date}" style="width: 140px;">
+                                <div style="display: flex; gap: 0.25rem;">
+                                    <button class="btn btn-success btn-icon" onclick="saveEditSubject('${s.id}')" title="সেভ করুন">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </button>
+                                    <button class="btn btn-ghost btn-icon" onclick="cancelEditSubject()" title="বাতিল">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #64748b;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Normal view
+                        return `
+                            <div class="subject-item">
+                                <div>
+                                    <span style="font-weight: 500;">${s.name}</span>
+                                    <span style="color: #64748b; margin-left: 0.5rem;">${formatDate(s.date)}</span>
+                                </div>
+                                <div style="display: flex; gap: 0.25rem;">
+                                    <button class="btn btn-ghost btn-icon" onclick="startEditSubject('${s.id}')" title="সম্পাদনা">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #3b82f6;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </button>
+                                    <button class="btn btn-ghost btn-icon" onclick="deleteSubject('${s.id}')" title="মুছুন">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #ef4444;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }).join('');
                 badge.textContent = toBengaliDigits(subjects.length);
                 badge.classList.remove('hidden');
                 count.textContent = `(${toBengaliDigits(subjects.length)}টি বিষয়)`;
