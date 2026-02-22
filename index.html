@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>হাজিরা শীট - Attendance Sheet Generator</title>
+    <title>EDUME হাজিরা শীট - Attendance Sheet Generator</title>
     <style>
         /* Base Styles */
         * {
@@ -778,7 +778,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
             </div>
-            <h1 class="login-title">হাজিরা শীট</h1>
+            <h1 class="login-title">EDUME হাজিরা শীট</h1>
             <p id="loginSubtitle" class="login-subtitle">প্রথমবার? পাসওয়ার্ড সেট করুন</p>
             
             <!-- First Time Setup -->
@@ -810,7 +810,7 @@
         <!-- Header -->
         <header class="header no-print">
             <div class="header-content">
-                <h1 class="header-title">হাজিরা শীট</h1>
+                <h1 class="header-title">EDUME হাজিরা শীট</h1>
                 <div class="header-actions">
                     <button class="btn btn-ghost btn-sm" onclick="showChangePasswordModal()">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1072,15 +1072,9 @@
                     <div class="card-content">
                         <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label class="form-label" style="margin: 0;">ব্যাচ নির্বাচন:</label>
-                                <select id="batchSelect" class="form-select" style="width: 200px;" onchange="updateBatchPreview()">
+                                <label class="form-label" style="margin: 0;">শিক্ষার্থী নির্বাচন:</label>
+                                <select id="previewSelect" class="form-select" style="width: 250px;" onchange="updatePreview()">
                                     <option value="all">সব শিক্ষার্থী</option>
-                                </select>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label class="form-label" style="margin: 0;">একক নির্বাচন:</label>
-                                <select id="previewSelect" class="form-select" style="width: 250px;" onchange="updateSinglePreview()">
-                                    <option value="">-- ব্যাচ নির্বাচন করুন --</option>
                                 </select>
                             </div>
                             <button class="btn btn-success" onclick="window.print()" style="margin-left: auto;">
@@ -1090,7 +1084,6 @@
                                 প্রিন্ট করুন
                             </button>
                         </div>
-                        <div id="batchInfo" style="margin-top: 0.75rem; padding: 0.5rem; background: #eff6ff; border-radius: 0.5rem; font-size: 0.875rem; color: #1e40af; display: none;"></div>
                     </div>
                 </div>
 
@@ -1176,7 +1169,7 @@
 
         <!-- Footer -->
         <footer class="header no-print" style="text-align: center; margin-top: 2rem;">
-            <p style="color: #64748b; font-size: 0.875rem;">হাজিরা শীট - উন্নত সংস্করণ | তৈরি করা হয়েছে ❤️ দিয়ে</p>
+            <p style="color: #64748b; font-size: 0.875rem;">EDUM ‘র তৈরী হাজিরা শীট - উন্নত সংস্করণ </p>
         </footer>
     </div>
 
@@ -1840,58 +1833,16 @@
 
         // Preview
         function updatePreviewSelect() {
-            const batchSelect = document.getElementById('batchSelect');
-            const singleSelect = document.getElementById('previewSelect');
-            
-            // Calculate number of batches (50 students per batch)
-            const batchSize = 50;
-            const totalBatches = Math.ceil(students.length / batchSize);
-            
-            // Update batch dropdown
-            let batchOptions = '<option value="all">সব শিক্ষার্থী (' + toBengaliDigits(students.length) + ' জন)</option>';
-            for (let i = 0; i < totalBatches; i++) {
-                const start = i * batchSize + 1;
-                const end = Math.min((i + 1) * batchSize, students.length);
-                batchOptions += `<option value="batch-${i}">ব্যাচ ${toBengaliDigits(i + 1)}: ${toBengaliDigits(start)}-${toBengaliDigits(end)} (${toBengaliDigits(end - start + 1)} জন)</option>`;
-            }
-            batchSelect.innerHTML = batchOptions;
-            
-            // Update single student dropdown
-            let singleOptions = '<option value="">-- একক শিক্ষার্থী নির্বাচন --</option>';
+            const select = document.getElementById('previewSelect');
+            select.innerHTML = '<option value="all">সব শিক্ষার্থী</option>';
             students.forEach((s, index) => {
-                singleOptions += `<option value="${index}">${s.name} (রোল: ${toBengaliDigits(s.roll)})</option>`;
+                select.innerHTML += `<option value="${index}">${s.name} (রোল: ${toBengaliDigits(s.roll)})</option>`;
             });
-            singleSelect.innerHTML = singleOptions;
         }
 
-        function updateBatchPreview() {
-            const batchSelect = document.getElementById('batchSelect');
-            const batchInfo = document.getElementById('batchInfo');
-            const batchValue = batchSelect.value;
-            
-            // Clear single selection
-            document.getElementById('previewSelect').value = '';
-            
-            updatePreview(batchValue);
-        }
-        
-        function updateSinglePreview() {
-            const singleSelect = document.getElementById('previewSelect');
-            const batchInfo = document.getElementById('batchInfo');
-            const singleValue = singleSelect.value;
-            
-            if (singleValue !== '') {
-                // Clear batch selection
-                document.getElementById('batchSelect').value = 'all';
-                updatePreview('single-' + singleValue);
-            } else {
-                updateBatchPreview();
-            }
-        }
-
-        function updatePreview(selectionType = 'all') {
+        function updatePreview() {
             const container = document.getElementById('previewContainer');
-            const batchInfo = document.getElementById('batchInfo');
+            const selectValue = document.getElementById('previewSelect').value;
 
             if (students.length === 0 || subjects.length === 0) {
                 container.innerHTML = `
@@ -1902,32 +1853,10 @@
                         <p>${students.length === 0 ? 'প্রিভিউ দেখতে শিক্ষার্থী যোগ করুন' : 'প্রিভিউ দেখতে বিষয় যোগ করুন'}</p>
                     </div>
                 `;
-                batchInfo.style.display = 'none';
                 return;
             }
 
-            let studentsToShow = [];
-            let infoText = '';
-            
-            if (selectionType === 'all') {
-                studentsToShow = students;
-                infoText = `সব শিক্ষার্থী দেখানো হচ্ছে: ${toBengaliDigits(students.length)} জন`;
-            } else if (selectionType.startsWith('batch-')) {
-                const batchIndex = parseInt(selectionType.replace('batch-', ''));
-                const batchSize = 50;
-                const start = batchIndex * batchSize;
-                const end = Math.min(start + batchSize, students.length);
-                studentsToShow = students.slice(start, end);
-                infoText = `ব্যাচ ${toBengaliDigits(batchIndex + 1)} দেখানো হচ্ছে: ${toBengaliDigits(start + 1)} থেকে ${toBengaliDigits(end)} (মোট ${toBengaliDigits(studentsToShow.length)} জন)`;
-            } else if (selectionType.startsWith('single-')) {
-                const index = parseInt(selectionType.replace('single-', ''));
-                studentsToShow = [students[index]];
-                infoText = `একক শিক্ষার্থী: ${students[index].name} (রোল: ${toBengaliDigits(students[index].roll)})`;
-            }
-            
-            // Update batch info
-            batchInfo.textContent = infoText;
-            batchInfo.style.display = 'block';
+            let studentsToShow = selectValue === 'all' ? students : [students[parseInt(selectValue)]];
             
             container.innerHTML = studentsToShow.map(student => createSheetHTML(student)).join('');
         }
